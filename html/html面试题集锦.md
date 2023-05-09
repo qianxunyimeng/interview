@@ -116,7 +116,7 @@ html中的替换元素有：<img>, <input>, <textarea>, <select>, <object>
 - 避免使用Table布局
 - 避免设置多层内联样式
 
-## `<script>`、`<script async>`和`<script defer>`的区别
+## 5.`<script>`、`<script async>`和`<script defer>`的区别
 
 ```html
 <script>立即加载并执行相应的脚本。会阻塞后面的文档加载；
@@ -124,13 +124,13 @@ html中的替换元素有：<img>, <input>, <textarea>, <select>, <object>
 <script defer>异步加载，脚本的执行需等倒所有文档加载完才执行。
 ```
 
-## 对影子(Shadow)DOM的了解
+## 6.对影子(Shadow)DOM的了解
 
 ```html
 Shadow DOM是HTML的一个规范 ，它允许浏览器开发者封装自己的HTML标签、CSS样式和特定的javascript代码，同时也可以让开发人员创建类似<video>这样的自定义一级标签，创建这些新标签内容和相关的的API被称为Web Component。
 ```
 
-## div模拟Textera
+## 7.div模拟Textera
 
 ```html
 <!DOCTYPE html>
@@ -157,7 +157,7 @@ Shadow DOM是HTML的一个规范 ，它允许浏览器开发者封装自己的HT
 </html>
 ```
 
-## html5都有哪些新的特性？移除了哪些元素
+## 8.html5都有哪些新的特性？移除了哪些元素
 
 ### 新特性
 
@@ -180,7 +180,7 @@ Shadow DOM是HTML的一个规范 ，它允许浏览器开发者封装自己的HT
 对可用性产生负面影响的元素：frame、frameset、noframes
 ```
 
-## 跨页面通信解决方案
+## 9.跨页面通信解决方案
 
 ### 方案一 storage
 
@@ -420,7 +420,7 @@ onconnect = function (e) {
 如果要使 SharedWorker 连接到多个不同的页面，这些页面必须是同源的（相同的协议、host 以及端口）。
 Shared Worker 在实现跨页面通信时的，它无法主动通知所有页面，需要刷新页面或者是定时任务来检查是否有新的消息。
 
-## video标签
+## 10.video标签
 
 | 属性 | 值 | 描述 |
 | :-----:| :----: | :----: |
@@ -432,11 +432,47 @@ Shared Worker 在实现跨页面通信时的，它无法主动通知所有页面
 | src  | url |  要播放的视频的 URL
 | width  | pixels | 设置视频播放器的宽度
 
-## 渐进式渲染是什么
+## 11.渐进式渲染是什么
 
 渐进式渲染是在网页中缓慢渲染数据的行为，以在用户的​​互联网连接或设备速度太慢时增加用户体验。
 渐进式呈现是用于提高网页性能（尤其是提高用户感知的加载速度），以尽快呈现页面的技术。
 
-## html直接输入多个空格为什么只能显示一个空格？
+## 12.html直接输入多个空格为什么只能显示一个空格？
 
 该行为由 CSS white-space 控制，其默认值 normal 的表现即为多个空格压缩成一个
+
+## 13.在新窗口打开链接的方法是什么？那怎么设置全站链接都在新窗口打开？
+```js
+<a href="#" target="_blank"></a>
+// 
+<head>
+    <base target="_blank">
+</head>
+```
+
+## 14.如何原样输出HTML代码，不被浏览器解析？
+- pre code标签：需要转义特殊字符
+- html转义
+- textarea标签
+```html
+ <pre>
+    &lt;span&gt;pre...&lt;/span&gt;
+    啦啦啦
+  </pre>
+  <br />
+  &lt;span&gt;pre...&lt;/span&gt;
+  啦啦啦
+  <br />
+  <code>
+    &lt;span&gt;code...&lt;/span&gt;
+    啦啦啦
+  </code>
+
+  <br/>
+  <textarea>
+    <span>span...</span>
+    啦啦啦
+  </textarea>
+```
+效果如下
+![原样输出html](../images/html-14.png)
