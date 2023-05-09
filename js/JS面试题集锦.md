@@ -1,4 +1,31 @@
 # JS面试题集合
+- [JS面试题集合](#js面试题集合)
+  - [1.typeof('abc')和typeof 'abc'都是string, 那么typeof是操作符还是函数](#1typeofabc和typeof-abc都是string-那么typeof是操作符还是函数)
+  - [2.你理解的"use strict";是什么?使用它有什么优缺点？](#2你理解的use-strict是什么使用它有什么优缺点)
+  - [3.”attribute“和“property”有什么不同](#3attribute和property有什么不同)
+  - [4.对new操作符符理解，手动实现一个new方法](#4对new操作符符理解手动实现一个new方法)
+  - [5.手写call,apply,bind](#5手写callapplybind)
+  - [6.判断字符串是否是回文](#6判断字符串是否是回文)
+  - [7.对象遍历方法Object.keys()和for...in的区别](#7对象遍历方法objectkeys和forin的区别)
+  - [8.Object.defineProperty方法](#8objectdefineproperty方法)
+  - [9.为什么会有跨域问题？怎么解决跨域？](#9为什么会有跨域问题怎么解决跨域)
+  - [10.说说你对IIFE的理解](#10说说你对iife的理解)
+  - [11.window对象和document对象有什么区别](#11window对象和document对象有什么区别)
+  - [12.创建对象的几种方式](#12创建对象的几种方式)
+  - [13.写一个使两个整数进行交换的方法（不能使用临时变量）](#13写一个使两个整数进行交换的方法不能使用临时变量)
+  - [14.JS事件和任务](#14js事件和任务)
+    - [宏任务和微任务有哪些](#宏任务和微任务有哪些)
+    - [任务执行顺序](#任务执行顺序)
+    - [练习题](#练习题)
+    - [宏任务之间的执行顺序](#宏任务之间的执行顺序)
+  - [15.web worker](#15web-worker)
+  - [16.document的load 和ready有什么区别？](#16document的load-和ready有什么区别)
+  - [17.理解constructor、prototype、\_\_proto\_\_和原型链](#17理解constructorprototype__proto__和原型链)
+  - [18.什么是原型和原型链](#18什么是原型和原型链)
+  - [19.如何实现a===1 \&\& a===2 \&\& a===3返回true？](#19如何实现a1--a2--a3返回true)
+  - [20. js继承实现方式及优缺点](#20-js继承实现方式及优缺点)
+
+
 
 ## 1.typeof('abc')和typeof 'abc'都是string, 那么typeof是操作符还是函数
 
@@ -24,12 +51,12 @@ typeof 是操作符，不是函数。可以添加括号，但是括号的作用�
 　　- 为未来新版本的Javascript做好铺垫
 ```
 
-## 4.”attribute“和“property”有什么不同
+## 3.”attribute“和“property”有什么不同
 
 property是DOM中的属性，是JavaScript里的对象。
 attribute是HTML标签上的特性，它的值只能够是字符串。
 
-## 5.对new操作符符理解，手动实现一个new方法
+## 4.对new操作符符理解，手动实现一个new方法
 
 new 操作符的几个作用
 
@@ -57,7 +84,7 @@ function create(Con, ...args) {
 4. 将 obj 绑定到构造函数上，并且传入剩余的参数
 5. 判断构造函数返回值是否为对象，如果为对象就使用构造函数返回的值，否则使用 obj，这样就实现了忽略构造函数返回的原始值。
 
-## 手写call,apply,bind
+## 5.手写call,apply,bind
 
 作用：改变函数内部的this指向
 call和apply会立即执行，bind回返回一个改变了上下文后的函数,不会立即执行
@@ -127,7 +154,7 @@ Function.prototype._bind = function(ctx, ...args) {
 }
 ```
 
-## 判断字符串是否是回文
+## 6.判断字符串是否是回文
 
 给定一个字符串，验证它是否是回文串，只考虑字母和数字字符，可以忽略字母的大小写。
 说明：本题中，我们将空字符串定义为有效的回文串。
@@ -163,12 +190,12 @@ var isPalindrome = function(s) {
 };
 ```
 
-## 对象遍历方法Object.keys()和for...in的区别
+## 7.对象遍历方法Object.keys()和for...in的区别
 
 Object.keys()：遍历对象的key,返回一个数组，数组值为对象自有的属性，不会包括继承原型的属性
 for in :以任意顺序遍历一个对象的属性，包括自身属性，以及继承自原型的属性
 
-## Object.defineProperty方法
+## 8.Object.defineProperty方法
 
 Object.defineproperty 的作用就是直接在一个对象上定义一个新属性，或者修改一个已经存在的属性。
 Object.defineproperty可以接收三个参数。
@@ -188,7 +215,7 @@ enumerable：  是否可以遍历,默认值 false 不可枚举
 configurable：  是否通过delete删除从而重新定义属性 默认值 false 不能删除
 ```
 
-## 为什么会有跨域问题？怎么解决跨域？
+## 9.为什么会有跨域问题？怎么解决跨域？
 
 跨域：指的是浏览器不能执行其他网站的脚本。它是由浏览器的同源策略造成的，是浏览器对javascript施加的安全限制。
 同源策略：是指协议，域名，端口都要相同，其中有一个不同都会产生跨域；
@@ -238,12 +265,12 @@ b. 子窗口：<http://child.domain.com/b.html>
 
 ```
 
-## 说说你对IIFE的理解
+## 10.说说你对IIFE的理解
 
 IIFE，全称为：Immediately Invoked Function Expression，即：立即调用函数表达式。
 
 ```js
-(function(){
+;(function(){
 })()
 ```
 
@@ -262,12 +289,12 @@ IIFE，全称为：Immediately Invoked Function Expression，即：立即调用�
 - 多个块级作用域需要多个嵌套；
 - 性能问题。
 
-## window对象和document对象有什么区别
+## 11.window对象和document对象有什么区别
 
 Window对象是全局对象global，所有的表达式都在当前的环境中计算，window对象实现了核心JavaScript所定义的全局属性和方法。
 document：代表整个HTML文档，可以用来访问页面中的所有元素。document对象是window对象的一部分可以通过window.document属性对其进行访问。
 
-## 创建对象的几种方式
+## 12.创建对象的几种方式
 
 方式一：new Object()
 
@@ -369,7 +396,7 @@ me.printIntroduction();
 
 传入一个原型对象，创建一个新对象，使用现有的对象来提供新创建的对象的__proto__，实现继承。
 
-## 写一个使两个整数进行交换的方法（不能使用临时变量）
+## 13.写一个使两个整数进行交换的方法（不能使用临时变量）
 
 利用执行顺序
 
@@ -394,7 +421,7 @@ let a = 1, b= 2
 [a, b] = [b, a]
 ```
 
-## JS事件和任务
+## 14.JS事件和任务
 
 JS任务分为同步任务和异步任务，异步任务又分为宏任务和微任务，其中异步任务属于耗时的任务。
 ![js任务](../images/js%E4%BB%BB%E5%8A%A1.png)
@@ -477,7 +504,7 @@ console.log(11);
 宏任务有setTimeout、setInterval、setImmediate、i/o操作、异步的ajax，它们之间的执行也是有先后顺序，它们之间的执行顺序是：
 setImmediate --> setTimeout --> setInterval --> i/o操作 --> 异步ajax
 
-## web worker
+## 15.web worker
 
 [更多内容](http://www.ruanyifeng.com/blog/2018/07/web-worker.html)
 Web Worker 的作用，就是为 JavaScript 创造多线程环境，允许主线程创建 Worker 线程，将一些任务分配给后者运行。在主线程运行的同时，Worker 线程在后台运行，两者互不干扰。等到 Worker 线程完成计算任务，再把结果返回给主线程。这样的好处是，一些计算密集型或高延迟的任务，被 Worker 线程负担了，主线程（通常负责 UI 交互）就会很流畅，不会被阻塞或拖慢。
@@ -506,11 +533,11 @@ Worker 线程不能执行alert()方法和confirm()方法，但可以使用 XMLHt
 
 Worker 线程无法读取本地文件，即不能打开本机的文件系统（file://），它所加载的脚本，必须来自网络。
 
-## document的load 和ready有什么区别？
+## 16.document的load 和ready有什么区别？
 
 主要执行顺序的区别，load：页面资源加载完成； ready：是dom加载完成。
 
-## 理解constructor、prototype、__proto__和原型链
+## 17.理解constructor、prototype、__proto__和原型链
 
 ① 当任意一个普通函数用于创建一类对象时，它就被称作构造函数，或构造器。
 
@@ -537,7 +564,7 @@ Person函数就是person1对象的构造函数。
 
 ④ 原型对象即实例对象自己构造函数内的prototype对象。
 
-## 什么是原型和原型链
+## 18.什么是原型和原型链
 
 1）每一个对象上，都有一个属性，叫__proto__，它指向了一个对象，这个对象我们叫原型对象。
 
@@ -547,7 +574,7 @@ Person函数就是person1对象的构造函数。
 
 4）原型链：原型链指查找对象上某个属性的查找机制，查找一个对象上的私有属性，先在自己的私有属性中找，找不到，就沿着__proto__去原型对象上找…
 
-## 如何实现a===1 && a===2 && a===3返回true？
+## 19.如何实现a===1 && a===2 && a===3返回true？
 
 ```js
 Object.defineProperty(this, 'a', {
@@ -575,3 +602,243 @@ Reflect.defineProperty(this, 'a', {
 });
 console.log(a === 1 && a === 2 && a === 3);//true
 ```
+
+## 20. js继承实现方式及优缺点
+
+  1. 原型链继承
+   
+```js
+function SuperType() {
+    this.property = true;
+}
+
+SuperType.prototype.getSuperValue = function() {
+    return this.property;
+}
+
+function SubType() {
+    this.subproperty = false;
+}
+
+// 这里是关键，创建SuperType的实例，并将该实例赋值给SubType.prototype
+SubType.prototype = new SuperType(); 
+
+SubType.prototype.getSubValue = function() {
+    return this.subproperty;
+}
+
+var instance = new SubType();
+console.log(instance.getSuperValue()); // true
+```
+
+原型链方案存在的缺点：多个实例对引用类型的操作会被篡改
+
+```js
+function SuperType(){
+  this.colors = ["red", "blue", "green"];
+}
+function SubType(){}
+
+SubType.prototype = new SuperType();
+
+var instance1 = new SubType();
+instance1.colors.push("black");
+alert(instance1.colors); //"red,blue,green,black"
+
+var instance2 = new SubType(); 
+alert(instance2.colors); //"red,blue,green,black"
+```
+
+优点: 父类方法复用
+缺点: 父类的所有引用属性会被所有子类共享，更改一个子类的引用属性，其他子类也会受影响;子类型实例不能给父类型构造函数传参
+
+  2. 借用构造函数继承
+使用父类的构造函数来增强子类实例，等同于复制父类的实例给子类
+```js
+function  SuperType(){
+    this.color=["red","green","blue"];
+}
+function  SubType(){
+    //继承自SuperType
+    SuperType.call(this);
+}
+var instance1 = new SubType();
+instance1.color.push("black");
+alert(instance1.color);//"red,green,blue,black"
+
+var instance2 = new SubType();
+alert(instance2.color);//"red,green,blue"
+
+```
+核心代码是SuperType.call(this)，创建子类实例时调用SuperType构造函数，于是SubType的每个实例都会将SuperType中的属性复制一份。
+
+优点: 
+- 可以在子类构造函数中向父类传参数
+- 父类的引用属性不会被共享
+
+
+缺点：
+- 子类不能访问父类原型上定义的方法（即不能访问Parent.prototype上定义的方法），因此所有方法属性都写在构造函数中，每次创建实例都会初始化
+
+3. 组合继承
+   
+   组合上述两种方法就是组合继承。用原型链实现对原型属性和方法的继承，用借用构造函数技术来实现实例属性的继承。
+```js
+function SuperType(name){
+  this.name = name;
+  this.colors = ["red", "blue", "green"];
+}
+SuperType.prototype.sayName = function(){
+  alert(this.name);
+};
+
+function SubType(name, age){
+  // 继承属性
+  // 第二次调用SuperType()
+  SuperType.call(this, name);
+  this.age = age;
+}
+
+// 继承方法
+// 构建原型链
+// 第一次调用SuperType()
+SubType.prototype = new SuperType(); 
+// 重写SubType.prototype的constructor属性，指向自己的构造函数SubType
+SubType.prototype.constructor = SubType; 
+SubType.prototype.sayAge = function(){
+    alert(this.age);
+};
+
+var instance1 = new SubType("Nicholas", 29);
+instance1.colors.push("black");
+alert(instance1.colors); //"red,blue,green,black"
+instance1.sayName(); //"Nicholas";
+instance1.sayAge(); //29
+
+var instance2 = new SubType("Greg", 27);
+alert(instance2.colors); //"red,blue,green"
+instance2.sayName(); //"Greg";
+instance2.sayAge(); //27
+```
+
+优点
+- 父类的方法可以复用
+- 可以在Child构造函数中向Parent构造函数中传参
+- 父类构造函数中的引用属性不会被共享
+
+缺点：
+
+- 第一次调用SuperType()：给SubType.prototype写入两个属性name，color。
+- 第二次调用SuperType()：给instance1写入两个属性name，color。
+
+实例对象instance1上的两个属性就屏蔽了其原型对象SubType.prototype的两个同名属性。所以，组合模式的缺点就是在使用子类创建实例对象时，其原型中会存在两份相同的属性/方法。
+
+4. 原型式继承
+   对参数对象的一种浅复制
+```js
+function object(obj){
+  function F(){}
+  F.prototype = obj;
+  return new F();
+}
+
+var person = {
+  name: "Nicholas",
+  friends: ["Shelby", "Court", "Van"]
+};
+
+var anotherPerson = object(person);
+anotherPerson.name = "Greg";
+anotherPerson.friends.push("Rob");
+
+var yetAnotherPerson = object(person);
+yetAnotherPerson.name = "Linda";
+yetAnotherPerson.friends.push("Barbie");
+
+alert(person.friends);   //"Shelby,Court,Van,Rob,Barbie"
+
+```
+
+优点：
+  - 父类方法可复用
+  
+缺点:
+
+  - 父类的引用会被所有子类所共享,存在篡改的可能，例如上面的friends属性
+  - 类实例不能向父类传参
+  
+  ES5中存在Object.create()的方法，能够代替上面的object方法。
+
+5. 寄生式继承
+   在原型式继承的基础上，增强对象，返回构造函数
+```js
+// 函数的主要作用是为构造函数新增属性和方法，以增强函数
+function createAnother(original){
+  var clone = object(original); // 通过调用 object() 函数创建一个新对象
+  clone.sayHi = function(){  // 以某种方式来增强对象
+    alert("hi");
+  };
+  return clone; // 返回这个对象
+}
+
+var person = {
+  name: "Nicholas",
+  friends: ["Shelby", "Court", "Van"]
+};
+var anotherPerson = createAnother(person);
+anotherPerson.sayHi(); //"hi"
+```
+
+缺点：
+  - 原型式继承
+  
+6. 寄生组合式继承
+  
+```js
+function inheritPrototype(subType, superType){
+  var prototype = Object.create(superType.prototype); // 创建对象，创建父类原型的一个副本
+  prototype.constructor = subType;                    // 增强对象，弥补因重写原型而失去的默认的constructor 属性
+  subType.prototype = prototype;                      // 指定对象，将新创建的对象赋值给子类的原型
+}
+
+// 父类初始化实例属性和原型属性
+function SuperType(name){
+  this.name = name;
+  this.colors = ["red", "blue", "green"];
+}
+SuperType.prototype.sayName = function(){
+  alert(this.name);
+};
+
+// 借用构造函数传递增强子类实例属性（支持传参和避免篡改）
+function SubType(name, age){
+  SuperType.call(this, name);
+  this.age = age;
+}
+
+// 将父类原型指向子类
+inheritPrototype(SubType, SuperType);
+
+// 新增子类原型属性
+SubType.prototype.sayAge = function(){
+  alert(this.age);
+}
+
+var instance1 = new SubType("xyc", 23);
+var instance2 = new SubType("lxy", 23);
+
+instance1.colors.push("2"); // ["red", "blue", "green", "2"]
+instance1.colors.push("3"); // ["red", "blue", "green", "3"]
+
+```
+这个例子的高效率体现在它只调用了一次SuperType 构造函数，并且因此避免了在SubType.prototype 上创建不必要的、多余的属性。于此同时，原型链还能保持不变；因此，还能够正常使用instanceof 和isPrototypeOf()。
+这是最成熟的方法，也是现在库实现的方法
+
+优点：
+- 只调用一次父类构造函数
+- Child可以向Parent传参
+- 父类方法可以复用
+- 父类的引用属性不会被共享
+  
+寄生式组合继承可以算是引用类型继承的最佳模式
+  
