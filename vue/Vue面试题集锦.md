@@ -958,3 +958,26 @@ event.currentTarget指向事件所绑定的元素，而event.target始终指向�
     利用v-if指令的特性。
 
     当组件的key 值变更时，会自动的重新渲染
+
+## 40. Vue实例初始化时，data、props、methods顺序
+
+```js
+function initState (vm) {
+    vm._watchers = [];
+    var opts = vm.$options;
+    if (opts.props) { initProps(vm, opts.props); }
+    if (opts.methods) { initMethods(vm, opts.methods); }
+    if (opts.data) {
+      initData(vm);
+    } else {
+      observe(vm._data = {}, true /* asRootData */);
+    }
+    if (opts.computed) { initComputed(vm, opts.computed); }
+    if (opts.watch && opts.watch !== nativeWatch) {
+      initWatch(vm, opts.watch);
+    }
+  }
+```
+以上为vue的部分源码，可以看出判断顺序：
+props > methods > data > computed > watch
+因此如果有同名属性或方法，会被覆盖
