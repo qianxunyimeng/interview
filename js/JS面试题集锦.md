@@ -223,7 +223,7 @@ configurable：  是否通过delete删除从而重新定义属性 默认值 fals
 跨域解决方案：
 jsonp
 document.domain + iframe跨域
-ocation.hash + iframe
+location.hash + iframe
 window.name + iframe跨域
 postMessage跨域
 跨域资源共享（CORS）
