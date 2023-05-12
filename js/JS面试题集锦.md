@@ -24,6 +24,14 @@
   - [18.什么是原型和原型链](#18什么是原型和原型链)
   - [19.如何实现a===1 \&\& a===2 \&\& a===3返回true？](#19如何实现a1--a2--a3返回true)
   - [20. js继承实现方式及优缺点](#20-js继承实现方式及优缺点)
+  - [21.offset、client、scroll系列理解](#21offsetclientscroll系列理解)
+    - [offset系列](#offset系列)
+      - [obj.offsetWidth](#objoffsetwidth)
+      - [obj.offsetHeight](#objoffsetheight)
+      - [offsetLeft:](#offsetleft)
+      - [obj.offsetTop](#objoffsettop)
+    - [client系列](#client系列)
+    - [scroll系列](#scroll系列)
 
 
 
@@ -842,3 +850,58 @@ instance1.colors.push("3"); // ["red", "blue", "green", "3"]
   
 寄生式组合继承可以算是引用类型继承的最佳模式
   
+## 21.offset、client、scroll系列理解
+
+### offset系列
+
+定义：元素在屏幕上占用的所有的可见的空间。
+
+元素可见的大小由其高度、宽度决定，包括所有内边距，滚动条和边框大小四个属性
+![offset系列](../images/js-21-1-1.png)
+
+<b>offsetParent</b>
+
+- offsetParent属性返回一个对象的引用，这个对象是距离调用offsetParent的父级元素中最近的（在包含层次中最靠近的），并且是已进行过CSS定位的容器元素。 如果这个容器元素未进行CSS定位, 则offsetParent属性的取值为根元素的引用。
+- 如果当前元素的父级元素中没有进行CSS定位（position为absolute/relative），offsetParent为body
+- 如果当前元素的父级元素中有CSS定位（position为absolute/relative），offsetParent取父级中最近的元素
+- <font color="red"><b>距离自己最近的并且具有定位属性(position为absolute/relative)的父元素</b></font>
+
+#### obj.offsetWidth 
+指 obj 控件自身的绝对宽度，不包括因 overflow 而未显示的部分，也就是其实际占据的宽度，整型，单位：像素。包含垂直方向上滚动条的宽度。
+
+<font style="font-weight: bold">实际占据的宽度具体是怎末计算的受 box-sizing的影响。
+
+如果： box-sizing: border-box；
+实际占据的宽度 = width
+
+如果： box-sizing: content-box;
+实际占据的宽度 = border + paddding + width</font>
+
+#### obj.offsetHeight 
+指 obj 控件自身的绝对高度，不包括因 overflow 而未显示的部分，也就是其实际占据的高度，整型，单位：像素。
+
+#### offsetLeft:
+元素的左外边框至包含元素的左内边框之间的像素距离
+
+#### obj.offsetTop
+元素的上外边框至包含元素offsetParent的上内边框之间的像素距离
+
+
+### client系列
+
+client指元素本身的可视内容，不包括overflow被折叠起来的部分，不包括滚动条、border，包括padding
+![client系列](../images/js-21-1-2.png)
+
+clientWidth:元素<font color="red"><b>内容区宽度</b></font> + 左右内边距宽度
+
+clientHeight：元素<font color="red"><b>内容区高度</b></font> + 山下内边距高度
+clientTop、clientLeft 这两个返回的是<font color="red"><b>元素周围边框的厚度</b></font>，一般它的值就是0。因为滚动条不会出现在顶部或者左侧
+
+### scroll系列
+滚动大小：指的是包含滚动内容的元素的大小。
+scroll指滚动，包括这个元素没显示出来的实际宽度，包括padding，不包括滚动条、border
+![scroll系列](../images/js-21-1-3.png)
+
+scrollLeft: 被隐藏在内容区域左侧的像素值，通过设置这个属性可以改变元素的滚动位置
+scrollTop：被隐藏在内容区域上方的像素值，通过这个属性可以改变元素的滚动位置
+scrollWidth和scrollHeight主要用于确定元素内容的实际大小
