@@ -51,3 +51,21 @@ Demo.propTypes = {
 - componentWillReceiveProps
 - componentWillUpdate
   并改名为 UNSAFE_componentWillMount、UNSAFE_componentWillReceiveProps、UNSAFE_componentWillUpdate
+
+## 6.React组件通信的几种方式
+- 父子组件：props，props回调
+- 兄弟组件：共同父级，再由父节点转发props，props回调
+- 跨级组件：context对象，注入全局变量：getChildContext;   获取全局变量：this.- context.color;
+- 非嵌套组件：使用事件订阅，向事件对象添加监听器，和触发事件来实现组件之间的通讯，通过引入event模块实现
+- 全局状态管理工具：Redux,Mobox维护全局store
+  
+## 7.react UI组件和容器组件的区别与应用
+
+  容器组件：拥有自己的状态，生命周期
+
+  UI组件：只负责页面UI渲染，不具备任何逻辑，功能单一，通常是无状态组件，没有自己的state,生命周期。
+
+## 8.React的请求放在componentWillMount有什么问题？
+- 在SSR（服务端渲染）中，componentWillMount生命周期会执行两次，导致多余请求
+- 在react16进行fiber重写后，componentWillMount 可能在一次渲染中多次调用
+- react17版本后要删除componentWillMount生命周期
