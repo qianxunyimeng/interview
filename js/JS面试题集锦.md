@@ -32,6 +32,16 @@
       - [obj.offsetTop](#objoffsettop)
     - [client系列](#client系列)
     - [scroll系列](#scroll系列)
+  - [22.JS原始类型有哪些](#22js原始类型有哪些)
+  - [23.改造下面的代码，使之输出0 - 9](#23改造下面的代码使之输出0---9)
+  - [24. var、let、const的区别](#24-varletconst的区别)
+        - [变量提升](#变量提升)
+          - [关于 let,var和function](#关于-letvar和function)
+        - [暂时性死区](#暂时性死区)
+        - [块级作用域](#块级作用域)
+        - [重复声明](#重复声明)
+        - [修改声明的变量](#修改声明的变量)
+
 
 
 
@@ -905,3 +915,135 @@ scroll指滚动，包括这个元素没显示出来的实际宽度，包括paddi
 scrollLeft: 被隐藏在内容区域左侧的像素值，通过设置这个属性可以改变元素的滚动位置
 scrollTop：被隐藏在内容区域上方的像素值，通过这个属性可以改变元素的滚动位置
 scrollWidth和scrollHeight主要用于确定元素内容的实际大小
+
+
+## 22.JS原始类型有哪些
+
+在 JS 中，存在着 7 种原始值，分别是：
+
+- boolean
+- null
+- undefined
+- number
+- string
+- symbol
+- bigint
+
+## 23.改造下面的代码，使之输出0 - 9
+js代码如下
+```js
+for (var i = 0; i < 10; i++) {
+    setTimeout(() => {
+        console.log(i);
+    }, 1000)
+}
+```
+原始输出：
+![](../images/js-23-1.png)
+
+修改方法如下
+
+方法一: 使用let作用域
+```js
+for (let i = 0; i< 10; i++){
+  setTimeout(() => {
+    console.log(i);
+    }, 1000)
+}
+```
+
+方法二: 闭包
+1秒钟后，一次性输出1到9的数字
+```js
+for (var i = 0; i < 10; i++) {
+    (i => {
+        setTimeout(() => {
+            console.log(i);
+        }, 1000)
+    })(i)
+}
+```
+
+方法三: IFEE立即执行函数
+
+立即输出1到9数字，不会延迟
+```js
+for (var i = 0; i < 10; i++) {
+    setTimeout((() => {
+        console.log(i);
+    })(), 1000)
+}
+
+```
+
+方法四：setTimeout函数传参
+
+```js
+for (let i = 0; i < 10; i++) {
+  setTimeout((i) => {
+    console.log(i);
+  }, 1000,i)
+}
+
+```
+
+方法五: let或const临时变量
+```js
+for (var i = 0; i < 10; i++) {
+  const _i = i
+  setTimeout(() => {
+    console.log(_i);
+  }, 1000)
+}
+```
+方法六: try catch
+```js
+for (var i = 0; i < 10; i++) {
+    try {
+        throw i
+    } catch(i) {
+        setTimeout(() => {
+            console.log(i);
+        }, 1000)
+    }
+}
+```
+
+## 24. var、let、const的区别
+var、let、const三者区别可以围绕下面五点展开
+变量提升
+暂时性死区
+块级作用域
+重复声明
+修改声明的变量
+
+##### 变量提升
+
+var声明的变量存在变量提升，即变量可以在声明之前调用，值为: undefined。
+let 和 const 定义的变量也会被提升，但是不会被初始化，不能被引用。
+
+当进入let变量的作用域时，会立即给它创建存储空间，但是不会对它进行初始化。
+
+变量的赋值分为3个阶段：
+1. 创建变量：在内存中开辟空间
+2. 初始化变量: 变量初始化为undefined
+3. 真正赋值:
+
+###### 关于 let,var和function
+- let创建阶段被提升
+- var创建和初始化被提升
+- function创建、初始化、赋值都被提升
+
+##### 暂时性死区
+let和const存在暂时性死区，只有等到声明变量的代码出现，才可以获取和使用该变量。
+
+##### 块级作用域
+var不存在块级作用域
+let和const存在块级作用域
+
+##### 重复声明
+var 允许重复声明
+let和const不允许重复声明
+
+##### 修改声明的变量
+var和let可以，const不可以
