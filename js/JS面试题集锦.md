@@ -1316,3 +1316,41 @@ function resolvePromise (promise2, x, resolve, reject) {
 export default MyPromise
 
 ```
+
+
+基础版本的then，无法实现then的链式调用，面试时写出 基础版本的then已经可以了
+```js
+then(onFulfilled, onRejected){ 
+   // 确保onFulfilled和onRejected 是函数类型
+    onFulfilled = typeof onFulfilled === 'function' ? onFulfilled : value => value;
+    onRejected = typeof onRejected === 'function' ? onRejected : reason => {
+      throw reason;
+    };
+
+    if (this.PromiseState === MyPromise.PENDING) {
+      this.onFulfilledCallbacks.push(() => {
+        setTimeout(() => {
+          onFulfilled(this.PromiseResult);
+        });
+      });
+      this.onRejectedCallbacks.push(() => {
+          setTimeout(() => {
+            onRejected(this.PromiseResult);
+          });
+      });
+    }
+
+
+    if (this.PromiseState === MyPromise.FULFILLED) {
+      setTimeout(() => {
+        onFulfilled(this.PromiseResult);
+      });   
+    }
+    if (this.PromiseState === MyPromise.REJECTED) {
+      setTimeout(() => {
+        onRejected(this.PromiseResult);
+      });  
+    }
+}
+
+```
