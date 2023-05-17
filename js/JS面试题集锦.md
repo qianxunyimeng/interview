@@ -44,6 +44,15 @@
         - [修改声明的变量](#修改声明的变量)
   - [25.setTimeout、setInterval 和 requestAnimationFrame 之间的区别](#25settimeoutsetinterval-和-requestanimationframe-之间的区别)
   - [26.手写Promise](#26手写promise)
+  - [27. 手写call、apply、bind](#27-手写callapplybind)
+  - [28. 手写new](#28-手写new)
+  - [29. new的工作原理、new和字面量创建对象的区别？](#29-new的工作原理new和字面量创建对象的区别)
+  - [30. V8 下的垃圾回收机制是怎么样的？](#30-v8-下的垃圾回收机制是怎么样的)
+        - [回收策略](#回收策略)
+      - [回收算法](#回收算法)
+        - [Scavenge算法（用于新生代垃圾回收机制）](#scavenge算法用于新生代垃圾回收机制)
+        - [Mark-sweep(标记清除) 和 Mark-compact（标记压缩） 算法（用于老生代垃圾回收机制）](#mark-sweep标记清除-和-mark-compact标记压缩-算法用于老生代垃圾回收机制)
+  - [31. null和undefined的区别](#31-null和undefined的区别)
 
 
 
@@ -594,6 +603,40 @@ Person函数就是person1对象的构造函数。
 3）每一个原型对象上，都是有一个属性，叫constructor，它指向此原型对象所对应的构造器
 
 4）原型链：原型链指查找对象上某个属性的查找机制，查找一个对象上的私有属性，先在自己的私有属性中找，找不到，就沿着__proto__去原型对象上找…
+
+![](../images/js-18-1-1.png)
+![](../images/js-18-1-2.png)
+
+上面两幅图都是对原型链的剖析
+```js
+function User() {}
+User.prototype.sayHello = function() {}
+ 
+var u1 = new User();
+var u2 = new User();
+ 
+// u1:{}  u1.__proto__ => User.prototype => Object.prototype => null
+// u2:{}  u1.__proto__ => User.prototype => Object.prototype => null
+ 
+console.log(u1.sayHello === u2.sayHello);   // true
+console.log(User.prototype.constructor); // User(){}
+console.log(User.prototype === Function.prototype); // false
+// User.__proto__ => Function.prototype
+console.log(User.__proto__ === Function.prototype); // true
+// Function.__proto__ => Function.prototype
+console.log(User.__proto__ === Function.__proto__); // true
+ 
+console.log(u1.__proto__ === u2.__proto__); // true  
+console.log(u1.__proto__ === User.__proto__); // false
+// Function.__proto__ => Function.prototype
+// Object.__proto__ => Function.prototype
+console.log(Function.__proto__ === Object.__proto__); // true
+// Function.prototype.__proto__=> Object.prototype
+// Object.prototype.__proto__ => null
+console.log(Function.prototype.__proto__ === Object.prototype.__proto__);  // false
+console.log(Function.prototype.__proto__ === Object.prototype); // true
+
+```
 
 ## 19.如何实现a===1 && a===2 && a===3返回true？
 
@@ -1185,7 +1228,7 @@ class MyPromise {
             reject(e); // 捕获前面onFulfilled中抛出的异常
           }
         });
-      } else if (this.PromiseState === MyPromise.FULFILLED) { 
+      } else if (this.PromiseState === MyPromise.REJECTED) { 
         setTimeout(() => {
           try {
             if (typeof onRejected !== 'function') {
@@ -1354,3 +1397,150 @@ then(onFulfilled, onRejected){
 }
 
 ```
+
+## 27. 手写call、apply、bind
+
+```js
+Function.prototype.myCall = function(context) {
+  if (typeof context === undefined || typeof context === null) {
+    context = window
+  }
+  const symbol = Symbol()
+  context[symbol] = this
+  const args = [...arguments].slice(1)
+  const result = context[symbol](...args)
+  delete context[symbol]
+  return result
+}
+
+Function.prototype.myApply = function(context) {
+  if (typeof context === undefined || typeof context === null) {
+    context = window
+  }
+  const symbol = Symbol()
+  context[symbol] = this
+  let result
+  // 处理参数和 call 有区别
+  if (arguments[1]) {
+    result = context[symbol](...arguments[1])
+  } else {
+    result = context[symbol]()
+  }
+  delete context[symbol]
+  return result
+}
+
+
+Function.prototype.myBind = function (context) {
+  if (typeof context === undefined || typeof context === null) {
+    context = window
+  }
+  const _this = this
+  const args = [...arguments].slice(1)
+  // 返回一个函数
+  return function F() {
+    // 因为返回了一个函数，我们可以 new F()，所以需要判断
+    if (this instanceof F) {
+      return new _this(...args, ...arguments)
+    }
+    // 这边的 apply 严谨点可以自己实现
+    return _this.apply(context, args.concat(...arguments))
+  }
+}
+
+```
+
+## 28. 手写new
+```js
+function create () {
+  let obj = {}
+  // arguments类数组调用数组的shift方法，删除第一个元素，并将删除的元素返回
+  let Con = [].shift.call(arguments)
+  obj.__proto__ = Con.prototype
+  let result = Con.apply(obj, arguments)
+  return result instanceof Object ? result : obj
+}
+
+function Person (name) {
+  this.name = name
+}
+
+console.log(create(Person,'张三'))
+```
+
+## 29. new的工作原理、new和字面量创建对象的区别？
+
+new的工作原理：
+1. 创建一个空对象，构造函数中的this会指向这个对象
+
+2. 这个新对象会被链接到原型
+
+3. 执行构造函数方法，其属性和方法都会被添加到this引用的对象中
+
+4. 如果构造函数中没有返回新对象，那么返回this，即创建新对象；否则，返回构造函数中返回的对象。
+
+new和字面量创建对象的区别：
+1. 字面量创建对象，不会调用Object构造函数，简洁且性能更好；
+
+2. new Object() 方式创建对象本质上是方法调用，涉及到在proto链中遍历该方法，当找到该方法后，又会生产方法调用必须的 堆栈信息，方法调用结束后，还要释放该堆栈，性能不如字面量的方式。
+
+
+## 30. V8 下的垃圾回收机制是怎么样的？
+##### 回收策略
+v8垃圾回收策略主要采用分代式回收机制，根具对象存活时间进行分代，将内存分为新生代和老生代两块内存空间。
+
+然后将对象存活时间较短的分配到新生代内存中，新建的对象也是优先分配到新生代内存中，将对象存活时间较长的分配到老生代内存中，然后两个不同的生代采用不同的算法进行垃圾回收。
+
+#### 回收算法
+
+##### Scavenge算法（用于新生代垃圾回收机制）
+在分代的基础上，新生代中的对象主要通过Scavenge算法进行垃圾回收。而在Scavenge的具体实现中，主要采用了Cheney算法。
+
+Cheney算法是一种采用<font color="red">复制的方式实现垃圾回收</font>的算法。
+
+<font color="red">它将新生代堆内存一分为二，每一部分空间称为semispace。
+
+在这两个semispace空间中，只有一个处于使用中，另一个处于闲置状态。
+处于使用状态的semispace空间称为From空间，处于闲置状态的空间称为To空间。</font>
+
+当我们分配对象时，先在From空间进行分配。当开始进行垃圾回收时，会检查From空间中的存活对象，这些存活对象将被复制到To空间中，而非存活对象占用的空间将会被释放。
+完成复制后，From空间和To空间的角色发生对换，称为翻转。
+
+优点：
+Scavenge由于只复制存活的对象，并且对于生命周期短的场景存活对象只占少部分，所以它在时间效率上有优异的表现。
+
+缺点：由于只能使用堆内存的一半，所以不适用大规模的垃圾回收机制中，是典型的牺牲空间换时间的算法。
+
+
+##### Mark-sweep(标记清除) 和 Mark-compact（标记压缩） 算法（用于老生代垃圾回收机制）
+当一个对象经过多次复制依然存活时，它将会被认为是生命周期较长的对象。
+这种较长生命周期的对象随后会被移动到老生代中，采用新的算法进行管理。
+对象从新生代中移动到老生代中的过程称为晋升。
+
+晋升条件：
+对象晋升的条件主要有两个。
+1. 对象在新生代期间是否经历过Scavenge回收；
+2. 是To空间的内存占用比超过限制（To空间内存消耗是否超过25%，如果超过对象直接晋升）。
+
+Mark-sweep 称为对象标记和清除，顾名思义该算法执行了两个步骤，标记和清除。
+
+标记：标记存活的对象
+清除：清除未被标记的对象，也就是死亡的对象
+
+<font color="red">Mark-Sweep最大的问题是在进行一次标记清除回收后，内存空间会出现不连续的状态。</font>
+
+这种内存碎片会对后续的内存分配造成问题，因为很可能出现需要分配一个大对象的情况，这时所有的碎片空间都无法完成此次分配，就会提前触发垃圾回收，而这次回收是不必要的。
+
+然而为了解决Mark-Sweep的内存碎片问题，Mark-Compact被提出来。
+Mark-Compact是标记整理的意思，是在Mark-Sweep的基础上演变而来的。
+它们的差别在于对象在标记为死亡后，在整理的过程中，将活着的对象往一端移动，移动完成后，直接清理掉边界外的内存。
+
+Mark-Sweep与Mark-Compact两者为策略递进关系，当空间不足以对从新生代中晋升过来的对象进行分配时才使用Mark-Compact，在整理的过程中，将活着的对象往一端移动，移动完成后，直接清理掉边界外的内存。
+
+完成移动后，就可以直接清除最右边的存活对象后面的内存区域完成回收。
+
+## 31. null和undefined的区别
+undefined: 已声明，但并未赋值
+null: 已声明已赋值，值是null
+
+
