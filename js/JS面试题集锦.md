@@ -53,6 +53,7 @@
         - [Scavenge算法（用于新生代垃圾回收机制）](#scavenge算法用于新生代垃圾回收机制)
         - [Mark-sweep(标记清除) 和 Mark-compact（标记压缩） 算法（用于老生代垃圾回收机制）](#mark-sweep标记清除-和-mark-compact标记压缩-算法用于老生代垃圾回收机制)
   - [31. null和undefined的区别](#31-null和undefined的区别)
+  - [32. 防抖和节流](#32-防抖和节流)
 
 
 
@@ -1544,4 +1545,42 @@ Mark-Sweep与Mark-Compact两者为策略递进关系，当空间不足以对从�
 undefined: 已声明，但并未赋值
 null: 已声明已赋值，值是null
 
+
+## 32. 防抖和节流
+
+防抖(debounce)：触发高频事件后 n 秒内函数只会执行一次，如果 n 秒内高频事件再次被触发，则重新计算时间。
+
+节流(thorttle)：高频事件触发，但在 n 秒内只会执行一次，所以节流会稀释函数的执行频率。
+
+```js
+// 防抖函数，立即执行版
+const debounce = (fn, delayTime) => {
+  let timerId
+  return function () {
+    let th = this
+    let args = arguments
+    // 说明第一次直接执行回调，反之不是，重新计时
+    timerId == null ? fn.apply(th, args) : clearTimeout(timerId)
+    timerId = setTimeout(() => fn.apply(th, args), delayTime)
+  }
+}
+
+// 函数节流 定时器和时间戳结合，触发会立即执行，最后一次触发回调和前一次触发的差小于delayTime 也会执行
+const throttle = (fn, delayTime) => {
+  let timerId, _start = Date.now()
+  return function() {
+    let th = this
+    let args = arguments
+    let _now = Date.now()
+    let remainTime = delayTime - (_now - _start)
+    if(remainTime <=0) {
+      fn.apply(th,args)
+      _start = Date.now()
+    }else{
+      clearTimeout(timerId)
+      setTimeout(()=>fn.apply(th, args), remainTime) 
+    }
+  }
+}
+```
 
