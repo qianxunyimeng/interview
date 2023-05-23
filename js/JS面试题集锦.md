@@ -1540,6 +1540,7 @@ Mark-Sweep与Mark-Compact两者为策略递进关系，当空间不足以对从�
 完成移动后，就可以直接清除最右边的存活对象后面的内存区域完成回收。
 
 ## 31. null和undefined的区别
+
 undefined: 已声明，但并未赋值
 null: 已声明已赋值，值是null
 
