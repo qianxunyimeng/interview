@@ -121,3 +121,50 @@ PureComponent其实就是一个继承自Component的子类，会自动加载shou
    3. 父组件是继承自Component，而子组件是继承自PureComponent那么就是看各自的props和state
    4. 当然如果父子组件都是继承自Component那么就是只要有更新，那么都会去重新渲染
 
+## 11. Context的实现方式
+
+childContextType: 17版本已被废弃
+createContext： 16版本开始提供的Api 
+
+## 12. Concurrent Mode
+
+[详细](https://cloud.tencent.com/developer/article/2033862)
+[知乎](https://zhuanlan.zhihu.com/p/60307571)
+
+### react 16之前的架构
+- reconciler：调和（也叫协调）器。协调可以理解为：将以虚拟形式存在的 VDOM 与真实 DOM 同步的一个过程（React 官方对 reconciler 的解释更偏向于源码角度）。所以<font color="red">协调器的一个核心就是 diff，React15 的协调也叫栈调和（Stack reconciler）</font>。
+- renderer：渲染器。React 组件发生更新时，调和器通知渲染器将变化的 VDOM 重新渲染到页面。
+
+### react 16及之后的架构（Fiber架构）
+
+React16 重写架构解决卡顿问题。
+
+上文提到，JS 线程和 GUI 线程是互斥的，所以在浏览器的一帧里（16.6ms）JS 脚本执行和页面渲染是同步执行的，一旦 JS 脚本执行时间过长，页面就会出现掉帧卡顿。
+
+而 React15 组件的挂载和更新都采用递归更新，一旦 vDOM 嵌套层次很深，页面就会出现比较严重的卡顿。
+
+React 的卡顿问题，无法简单地通过提高 CPU 计算速度来解决。解决这个问题的答案，就是在浏览器每一帧的时间里，预留出来一部分给 JS 线程（从 源码 可以看到预留的时间是 5ms）。
+
+如果预留的时间用完了，JS 线程还没执行完，那么 JS 线程就会被中断阻塞，GUI 渲染线程获得执行权，这一帧执行完了，React 则继续被中断的任务。其实，浏览器已经实现了这一个 API，参见 requestIdleCallback。由于兼容性等原因，React 实现一套自己的 Polyfill ，这就是 Scheduler（调度器），一起组成了 React16 的新架构：
+
+- Scheduler：调度器。
+- Reconciler：协调器。<font color="red">由 Stack Reconciler 变成 Fiber Reconciler。</font>
+- Renderer：渲染器。
+
+React16 的 Reconciler 和 Renderer 也不再像 React15 一样交替工作，原因很简单，中断更新会带来一个问题 —— 渲染不完全。所以 React16 的解决方法是给 VDOM 打标记，然后统一更新，具体流程如下：
+
+1. Scheduler 发现浏览器有空闲时间，把更新任务交给 Reconciler；
+2. Reconciler 给需要变化的组件打上 增/删/更新 的 Tag（ReactSideEffectTags）；
+3. 当所有组件都打上标记后，才会交给 Renderer 处理。
+
+### Concurrent Mode
+
+Concurrent Mode 是什么？
+
+Concurrent Mode 是 React 的一组新功能。可帮助应用保持响应，并根据用户的设备性能和网速进行适当地调整。
+
+#### Concurrent Mode 的特性？
+
+- 可以控制渲染流程，可中断 JS 执行，把控制权交还给浏览器。
+- 并发，引入优先级调度算法，可以并发执行多个更新任务。
+- 将人机交互的研究成果投入实际的应用当中。
