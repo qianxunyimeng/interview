@@ -168,3 +168,112 @@ Concurrent Mode 是 React 的一组新功能。可帮助应用保持响应，并
 - 可以控制渲染流程，可中断 JS 执行，把控制权交还给浏览器。
 - 并发，引入优先级调度算法，可以并发执行多个更新任务。
 - 将人机交互的研究成果投入实际的应用当中。
+
+## 13. 类组件绑定this的几种方式
+
+  1. 构造器内部使用bind绑定
+   
+  ```js
+  import React, {Component} from 'react'
+​
+    class Test extends React.Component {
+    constructor (props) {
+    super(props)
+    this.state = {message: 'Allo!'}
+    //在构造函数中绑定this
+      this.handleClick = this.handleClick.bind(this)
+    }
+    ​
+    handleClick (e) {
+      console.log(this.state.message)
+    }
+    ​
+    render () {
+      return (
+      <div>
+        <button onClick={ this.handleClick }>Say Hello</button>
+      </div>
+      )}
+    } 
+
+   ```
+   优点: 避免每次渲染都需要重新绑定
+
+  2. 在render内部使用bind绑定
+   ```js
+     import React, {Component} from 'react'
+​
+      class Test extends React.Component {
+        constructor (props) {
+        super(props)
+          this.state = {message: 'Allo!'}
+        }
+      ​
+        handleClick (name, e) {
+          console.log(this.state.message + name)
+        }
+        ​//在render函数中绑定
+        render () {
+          return (
+            <div>
+              <button onClick={ this.handleClick.bind(this, '赵四') }>Say Hello</button>
+            </div>
+          )
+        }
+      } 
+   ```
+
+   3. render内部调用时使用箭头函数包裹
+   ```js
+    class Test extends React.Component {
+      constructor (props) {
+        super(props)
+        this.state = {message: 'Allo!'}
+      }
+    ​
+      handleClick (e) {
+        console.log(this.state.message)
+      }
+    ​//通过箭头函数绑定this
+      render () {
+        return (
+          <div>
+            <button onClick={ ()=>{ this.handleClick() } }>Say Hello</button>
+          </div>
+        )
+      }
+    }
+   ```
+   4. 函数定义时使用箭头函数
+   ```js
+    //1.在箭头函数中执行函数
+    class Test extends React.Component {
+      handleClick = (name="tom") => {
+          console.log(name)
+      }
+      render () {
+        return (
+          <div>
+            <!-- 无参数 -->
+            <button onClick={this.handleClick}>Say Hello</button>
+            <!-- 有参数 -->
+            <button onClick={()=>{this.handleClick('tom')}}>Say Hello</button>
+          </div>
+        )
+      }
+    }
+    //2.手动绑定this
+    class Test extends React.Component {
+      handleClick = (name) => {
+          console.log(name)
+      }
+      render () {
+        return (
+          <div>
+            <button onClick={()=>{this.handleClick.bind(this, 'tom')}}>Say Hello</button>
+          </div>
+        )
+      }
+    }
+
+   ```

@@ -2,7 +2,7 @@
 
 ## 1. 有使用过vue吗？说说你对vue的理解
 
-vue是一套用于构建用户界面的渐进式框架。被设计为自底向上逐层应用。vue核心库只关心视图层。
+Vue 是一个构建数据驱动的 Web 界面的渐进式框架。 Vue 的目标是通过尽可能简单的 API 实现响应的数据绑定和组合的视图组件。核心是一个响应的数据绑定系统。
 
 优点有：轻量（大小只有十几k），简单易学；实现双向数据绑定和组件化；视图、数据、结构分离，是数据更改更简单；使用虚拟DOM，减少了dom操作；运行速度快；
 
@@ -77,6 +77,16 @@ beforeDestroy -> onBeforeUnmount 组件挂载到节点上之前执行的函数�
 
 destroyed     -> onUnmounted 组件卸载之前执行的函数。
 
+### 多组件（父子组件）中生命周期的调用顺序说一下
+
+组件的调用顺序都是先父后子，渲染完成的顺序是先子后父。组件的销毁操作是先父后子，销毁完成的顺序是先子后父。
+
+1. 加载渲染过程：父beforeCreate->父created->父beforeMount->子beforeCreate->子created->子beforeMount- >子mounted->父mounted
+2. 子组件更新过程：父beforeUpdate->子beforeUpdate->子updated->父updated
+3. 父组件更新过程：父 beforeUpdate -> 父 updated
+4. 销毁过程：父beforeDestroy->子beforeDestroy->子destroyed->父destroyed
+
+
 ## 6. 使用Vue2写的项目如何升级为Vue3？需要考虑哪些因素？
 
 Vue3不支持IE11
@@ -84,7 +94,7 @@ Vue3不支持IE11
 ## 7. Vue2和Vue3数据双向绑定的原理及区别
 
 vue2
-使用Object.defineProperty对象以及对象属性的劫持+发布订阅模式，只要数据发生变化直接通知变化 并驱动视图更新。
+采用数据劫持结合发布订阅模式（PubSub 模式）的方式，通过 Object.defineProperty 来劫持各个属性的 setter、getter，在数据变动时发布消息给订阅者，触发相应的监听回调。
 
 ```html
 1.实现一个监听器Observer，用来劫持并监听所有属性，如果有变动的，就通知订阅者。
@@ -96,7 +106,7 @@ vue2
 
 Vue3
 通过Proxy代理拦截对data任意属性的操作(13种),包括对属性值的读写，添加，删除等等...
-通过Reflet动态对呗代理对象相应属性进行相应的操作。
+通过Reflet动态对代理对象相应属性进行相应的操作。
 
 
 ## 8. Vue2 数据定义不在data里有什么问题，有什么解决方案
@@ -105,8 +115,37 @@ Vue3
 
 ## 9. Vue2是如何监测数组数据的变化
 
-Vue2是监测不到通过数组索引修改值的变化。
-Vue2包装了数组相关的七个方法(push,pop,shift,unshift,splice,sort,reverse),通过这七种方法操作数组数据，vue是可以监测的数据的变化
+Vue2.x 中实现检测数组变化的方法，是将数组的常用方法(push,pop,shift,unshift,splice,sort,reverse)进行了重写。Vue 将 data 中的数组进行了原型链重写，指向了自己定义的数组原型方法。这样当调用数组 api 时，可以通知依赖更新。如果数组中包含着引用类型，会对数组中的引用类型再次递归遍历进行监控。这样就实现了监测数组变化。
+流程:
+
+1. 初始化传入 data 数据执行 initData
+2. 将数据进行观测 new Observer
+3. 将数组原型方法指向重写的原型
+4. 深度观察数组中的引用类型
+
+有两种情况无法检测到数组的变化。
+
+1. 当利用索引直接设置一个数组项时，例如 vm.items[indexOfItem] = newValue
+2. 当修改数组的长度时，例如 vm.items.length = newLength
+
+不过这两种场景都有对应的解决方案。
+
+利用索引设置数组项的替代方案
+
+```js
+//使用该方法进行更新视图
+// vm.$set，Vue.set的一个别名
+vm.$set(vm.items, indexOfItem, newValue)
+```
+
+修改数组的长度的替代方案
+
+```js
+//使用该方法进行更新视图
+// Array.prototype.splice
+vm.items.splice(indexOfItem, 1, newValue)
+```
+
 
 ## 10. Vue3组件通信方式
 
@@ -1025,6 +1064,25 @@ MVC 有一个巨大的缺陷就是控制器承担的责任太大了，随着项�
 ### 区别
 
 把​​​​​​​MVC 中 Controller 演变成 MVVM 中的 viewModel，MVVM 主要解决了 MVC 中大量的 DOM 操作使页面渲染性能降低，加载速度变慢，影响用户体验。vue 数据驱动，通过数据来显示视图层而不是节点操作。MVC 和 MVVM 其实区别并不大，都是一种设计思想， MVC 和 MVVM 的区别并不是 VM 完全取代了 C，只是在 MVC 的基础上增加了一层 VM，只不过是弱化了 C 的概念， <font color="red">ViewModel 存在目的在于抽离 Controller 中展示的业务逻辑，而不是替代 Controller，其它视图 操作业务等还是应该放在 Controller 中实现，也就是说 MVVM 实现的是业务逻辑组件的重用， 使开发更高效，结构更清晰，增加代码的复用性。</font>
+
+## 42 vue2.x 和 vuex3.x 渲染器的 diff 算法分别说一下
+
+简单来说，diff 算法有以下过程
+
+- 同级比较，再比较子节点
+- 先判断一方有子节点一方没有子节点的情况(如果新的 children 没有子节点，将旧的子节点移除)
+- 比较都有子节点的情况(核心 diff)
+- 递归比较子节点
+
+正常 Diff 两个树的时间复杂度是 O(n^3)，但实际情况下我们很少会进行跨层级的移动 DOM，所以 Vue 将 Diff 进行了优化，从O(n^3) -> O(n)，只有当新旧 children 都为多个子节点时才需要用核心的 Diff 算法进行同层级比较。
+
+Vue2 的核心 Diff 算法采用了双端比较的算法，同时从新旧 children 的两端开始进行比较，借助 key 值找到可复用的节点，再进行相关操作。相比 React 的 Diff 算法，同样情况下可以减少移动节点次数，减少不必要的性能损耗，更加的优雅。
+
+Vue3.x 借鉴了 ivi 算法和 inferno 算法
+在创建 VNode 时就确定其类型，以及在 mount/patch 的过程中采用位运算来判断一个 VNode 的类型，在这个基础之上再配合核心的 Diff 算法，使得性能上较 Vue2.x 有了提升。该算法中还运用了动态规划的思想求解最长递归子序列。
+
+## 43. vue3 diff算法简述过程
+
 
 
 
