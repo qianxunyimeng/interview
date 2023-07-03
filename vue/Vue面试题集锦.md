@@ -1081,7 +1081,80 @@ Vue2 的核心 Diff 算法采用了双端比较的算法，同时从新旧 child
 Vue3.x 借鉴了 ivi 算法和 inferno 算法
 在创建 VNode 时就确定其类型，以及在 mount/patch 的过程中采用位运算来判断一个 VNode 的类型，在这个基础之上再配合核心的 Diff 算法，使得性能上较 Vue2.x 有了提升。该算法中还运用了动态规划的思想求解最长递归子序列。
 
-## 43. vue3 diff算法简述过程
+## 43. Vue 的路由实现
+
+可以从以下方面展开回答：
+
+- 解释 hash 模式和 history 模式的实现原理
+- 说一下  `router` 与 `route` 的区别
+- vueRouter 有哪几种导航守卫？
+- 解释一下 vueRouter 的完整的导航解析流程是什么
+
+### 解释 hash 模式和 history 模式的实现原理
+
+后面 hash 值的变化，不会导致浏览器向服务器发出请求，浏览器不发出请求，就不会刷新页面；通过监听 `hashchange` 事件可以知道 hash 发生了哪些变化，然后根据 hash 变化来实现更新页面部分内容的操作。
+
+history 模式的实现，主要是 HTML5 标准发布的两个 API，`pushState` 和 `replaceState`，这两个 API 可以在改变 URL，但是不会发送请求。这样就可以监听 url 变化来实现更新页面部分内容的操作。
+
+两种模式的区别：
+
+首先是在 URL 的展示上，hash 模式有“#”，history 模式没有
+刷新页面时，hash 模式可以正常加载到 hash 值对应的页面，而 history 没有处理的话，会返回 404，一般需要后端将所有页面都配置重定向到首页路由
+在兼容性上，hash 可以支持低版本浏览器和 IE
+
+
+### 说一下  `router` 与 `route` 的区别
+
+$route 对象表示当前的路由信息，包含了当前 URL 解析得到的信息。包含当前的路径，参数，query 对象等。
+
+- $route.params： 一个 key/value 对象，包含了 动态片段 和 全匹配片段，如果没有路由参数，就是一个空对象。
+- $route.query：一个key/value对象，表示URL查询参数。例如对于路径/foo?user=1，则有route.query.user == 1，如果没有查询参数，则是个空对象。
+- $route.hash：当前路由的 hash 值 (不带 #) ，如果没有 hash 值，则为空字符串。
+- $route.fullPath：完成解析后的 URL，包含查询参数和 hash 的完整路径。
+- $route.matched：数组，包含当前匹配的路径中所包含的所有片段所对应的配置参数对象。
+- $route.name：当前路径名字
+- $route.meta：路由元信息
+
+$route 对象出现在多个地方:
+
+- 组件内的 this.$route 和 route watcher 回调（监测变化处理）
+- router.match(location) 的返回值
+- scrollBehavior 方法的参数
+- 导航钩子的参数，例如 router.beforeEach 导航守卫的钩子函数中，to 和 from 都是这个路由信息对象。
+
+$router 对象是全局路由的实例，是 router 构造方法的实例。
+
+$router 对象常用的方法有：
+
+- push：向 history 栈添加一个新的记录
+- go：页面路由跳转前进或者后退
+- replace：替换当前的页面，不会向 history 栈添加一个新的记录
+
+### vueRouter 有哪几种导航守卫？
+
+- 全局前置/钩子：beforeEach、beforeR-esolve、afterEach
+- 路由独享的守卫：beforeEnter
+- 组件内的守卫：beforeRouteEnter、beforeRouteUpdate、beforeRouteLeave
+
+### 解释一下 vueRouter 的完整的导航解析流程是什么
+
+一次完整的导航解析流程如下：
+
+1. 导航被触发。
+2. 在失活的组件里调用离开守卫。
+3. 调用全局的 beforeEach 守卫。
+4. 在重用的组件里调用 beforeRouteUpdate 守卫（2.2+）。
+5. 在路由配置里调用 beforeEnter。
+6. 解析异步路由组件。
+7. 在被激活的组件里调用 beforeRouteEnter。
+8. 调用全局的 beforeResolve 守卫（2.5+）。
+9. 导航被确认。
+10. 调用全局的 afterEach 钩子。
+11. 触发 DOM 更新。
+12. 用创建好的实例调用 beforeRouteEnter 守卫中传给 next 的回调函数。
+
+
+
 
 
 
