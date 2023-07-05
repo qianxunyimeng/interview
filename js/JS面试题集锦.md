@@ -1,5 +1,5 @@
-# JS面试题集合
-- [JS面试题集合](#js面试题集合)
+# JS考点汇总
+- [JS考点汇总](#js考点汇总)
   - [1.typeof('abc')和typeof 'abc'都是string, 那么typeof是操作符还是函数](#1typeofabc和typeof-abc都是string-那么typeof是操作符还是函数)
   - [2.你理解的"use strict";是什么?使用它有什么优缺点？](#2你理解的use-strict是什么使用它有什么优缺点)
   - [3.”attribute“和“property”有什么不同](#3attribute和property有什么不同)

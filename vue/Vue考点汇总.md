@@ -1,4 +1,4 @@
-# Vue面试题集锦
+# Vue考点汇总
 
 ## 1. 有使用过vue吗？说说你对vue的理解
 
@@ -1153,9 +1153,150 @@ $router 对象常用的方法有：
 11. 触发 DOM 更新。
 12. 用创建好的实例调用 beforeRouteEnter 守卫中传给 next 的回调函数。
 
+### 组件级守卫详解
+
+beforeRouteEnter（不！能！获取组件实例 this ！！！）
+![beforeRouteEnter](../images/vue-43-1.png)
+
+beforeRouteUpdate
+![beforeRouteUpdate](../images/vue-43-2.png)
+
+beforeRouteLeave
+![beforeRouteLeave](../images/vue-43-3.png)
+
+## 44. Vue样式隔离 scoped实现原理
+
+vue 中的 scoped 属性的效果主要通过 PostCSS 转译实现的。PostCSS 给一个组件中的所有 DOM 添加了一个独一无二的动态属性，然后，给 CSS 选择器额外添加一个对应的属性选择器来选择该组件中 DOM，这种做法使得样式只作用于含有该属性的 DOM，即组件内部 DOM。
+
+转译前
+
+```vue
+<template>
+  <div class="example">hi</div>
+</template>
+
+<style scoped>
+.example {
+  color: red;
+}
+</style>
+```
+
+转译后
+
+```vue
+<template>
+  <div class="example" data-v-5558831a>hi</div>
+</template>
+
+<style>
+.example[data-v-5558831a] {
+  color: red;
+}
+</style>
+```
+
+## 45. keep-alive 相关
+
+- keep-alive的实现原理是什么
+- 与keep-alive相关的生命周期函数是什么，什么场景下会进行使用
+- keep-alive的常用属性有哪些
+
+##### 什么是keep-alive
+
+keep-alive是Vue的内置组件，当它包裹动态组件时，会缓存不活动的组件实例，而不是销毁它们。keep-alive是一个抽象组件，它自身不会渲染一个DOM元素，也不会出现在父组件中。
+
+##### 作用
+
+在组件切换过程中 把切换出去的组件保留在内存中，防止重复渲染DOM，减少加载时间及性能消耗，提高用户体验性
+
+##### 原理
+
+created和destroyed钩子
+
+- created钩子会创建一个cache对象，用来作为缓存容器，保存vnode节点。
+- destroyed钩子则在组件被销毁的时候清除cache缓存中的所有组件实例。
+
+```js
+created () {
+/** 缓存对象 */
+  this.cache = Object.create(null)
+  this.keys = []
+},
+/* destroyed钩子中销毁所有cache中的组件实例 */
+destroyed () {
+  for (const key in this.cache) {
+    pruneCacheEntry(this.cache, key, this.keys)
+  }
+},
+```
+
+render钩子
+keep-alive实现缓存的核心代码就在这个钩子函数里。
+
+1. 先获取到插槽里的内容
+2. 调用getFirstComponentChild方法获取第一个子组件，获取到该组件的name，如果有name属性就用name，没有就用tag名。
+3. 接下来会将这个name通过include与exclude属性进行匹配，匹配不成功（说明不需要进行缓存）则不进行任何操作直接返回这个组件的 vnode（vnode是一个VNode类型的对象），否则的话走下一步缓存
+4. 缓存机制：接下来的事情很简单，根据key在this.cache中查找，如果存在则说明之前已经缓存过了，直接将缓存的vnode的componentInstance（组件实例）覆盖到目前的vnode上面。否则将vnode存储在cache中。最后返回vnode（有缓存时该vnode的componentInstance已经被替换成缓存中的了）
+/* 如果命中缓存，则直接从缓存中拿 vnode 的组件实例 */
+```js
+if (cache[key]) {
+    vnode.componentInstance = cache[key].componentInstance
+    /* 调整该组件key的顺序，将其从原来的地方删掉并重新放在最后一个 */
+    remove(keys, key)
+    keys.push(key)
+} 
+/* 如果没有命中缓存，则将其设置进缓存 */
+else {
+    cache[key] = vnode
+    keys.push(key)
+    /* 如果配置了max并且缓存的长度超过了this.max，则从缓存中删除第一个 */
+    if (this.max && keys.length > parseInt(this.max)) {
+        pruneCacheEntry(cache, keys[0], keys, this._vnode)
+    }
+}
+/* 最后设置keepAlive标记位 */
+vnode.data.keepAlive = true
+```
+
+## 46. nextTick 的作用是什么？他的实现原理是什么？
+
+作用：vue 更新 DOM 是异步更新的，数据变化，DOM 的更新不会马上完成，nextTick 的回调是在下次 DOM 更新循环结束之后执行的延迟回调。
+实现原理：nextTick 主要使用了宏任务和微任务。根据执行环境分别尝试采用
+
+- Promise：可以将函数延迟到当前函数调用栈最末端
+- MutationObserver ：是 H5 新加的一个功能，其功能是监听 DOM 节点的变动，在所有 DOM 变动完成后，执行回调函数
+- setImmediate：用于中断长时间运行的操作，并在浏览器完成其他操作（如事件和显示更新）后立即运行回调函数
+- 如果以上都不行则采用 setTimeout 把函数延迟到 DOM 更新之后再使用，原因是宏任务消耗大于微任务，优先使用微任务，最后使用消耗最大的宏任务。
+
+## 47. Vue 的 computed 的实现原理
+
+<font color="red">当组件实例触发生命周期函数 beforeCreate 后</font>，它会做一系列事情，其中就包括对 computed 的处理。
+它会<font color="red">遍历 computed 配置中的所有属性，为每一个属性创建一个 Watcher 对象</font>，并传入一个函数，该函数的本质其实就是 computed 配置中的 getter，这样一来，getter 运行过程中就会<font color="red">收集依赖</font>
+
+但是和渲染函数不同，<font color="red">为计算属性创建的 Watcher 不会立即执行(lazy配置)</font>，因为要考虑到该计算属性是否会被渲染函数使用，如果没有使用，就不会得到执行。因此，在创建 Watcher 的时候，它使用了 lazy 配置，lazy 配置可以让 Watcher 不会立即执行。
+
+收到 lazy 的影响，<font color="red">Watcher 内部会保存两个关键属性来实现缓存，一个是 value，一个是 dirty</font>
+value 属性用于保存 Watcher 运行的结果，受 lazy 的影响，该值在最开始是 undefined
+dirty 属性用于指示当前的 value 是否已经过时了，即是否为脏值，受 lazy 的影响，该值在最开始是 true
+
+Watcher 创建好后，vue 会使用代理模式，将计算属性挂载到组件实例中
+当读取计算属性时，vue 检查其对应的 Watcher 是否是脏值，如果是，则运行函数，计算依赖，并得到对应的值，保存在 Watcher 的 value 中，然后设置 dirty 为 false，然后返回。
+如果 dirty 为 false，则直接返回 watcher 的 value
+
+<font color="red">当计算属性的依赖变化时，会先触发计算属性的 Watcher 执行，此时，它只需设置 dirty 为 true 即可，不做任何处理。</font>
+由于依赖同时会收集到组件的 Watcher，因此组件会重新渲染，而重新渲染时又读取到了计算属性，由于计算属性目前已为 dirty，因此会重新运行 getter 进行运算
+而对于计算属性的 setter，则极其简单，当设置计算属性时，直接运行 setter 即可。
 
 
+## 48. Vue complier 的实现原理
 
+在使用 vue 的时候，我们有两种方式来创建我们的 HTML 页面，第一种情况，也是大多情况下，我们会使用模板 template 的方式，因为这更易读易懂也是官方推荐的方法；第二种情况是使用 render 函数来生成 HTML，它比 template 更接近最终结果。
+complier 的主要作用是解析模板，生成渲染模板的 render， 而 render 的作用主要是为了生成 VNode
+complier 主要分为 3 大块：
 
+- parse：接受 template 原始模板，按着模板的节点和数据生成对应的 ast
+- optimize：遍历 ast 的每一个节点，标记静态节点，这样就知道哪部分不会变化，于是在页面需要更新时，通过 diff 减少去对比这部分DOM，提升性能
+- generate 把前两步生成完善的 ast，组成 render 字符串，然后将 render 字符串通过 new Function 的方式转换成渲染函数
 
 
