@@ -556,3 +556,34 @@ body{
   height: 100vh;
 }
 ```
+
+## 17. 在页面上隐藏元素的方法有哪些？
+
+![页面隐藏元素](../images/页面隐藏元素.png)
+
+
+## 18. BFC
+BFC（Block formatting context），即块级格式化上下文，它作为 HTML 页面上的一个独立渲染区域，只有区域内元素参与渲染，且不会影响其外部元素。
+
+BFC触发条件:
+- 根元素或其它包含它的元素
+- 浮动元素 (元素的 float 不是 none)
+- 绝对定位元素 (元素具有 position 为 absolute 或 fixed)
+- 内联块 (元素具有 display: inline-block)
+- 表格单元格 (元素具有 display: table-cell，HTML表格单元格默认属性)
+- 表格标题 (元素具有 display: table-caption, HTML表格标题默认属性)
+- 具有overflow 且值不是 visible 的块元素，
+- display: flow-root
+- column-span: all 应当总是会创建一个新的格式化上下文，即便具有 column-span: all 的元素并不被包裹在一个多列容器中。
+- 一个块格式化上下文包括创建它的元素内部所有内容，除了被包含于创建新的块级格式化上下文的后代元素内的元素。
+
+BFC特性:
+1. 使 BFC 内部浮动元素不会到处乱跑；
+2. 和浮动元素产生边界。
+3. 计算BFC的高度时，浮动子元素也参与计算
+4. BFC的区域不会与float的元素区域重叠
+  
+应用场景:
+1. 解决浮动子元素导致父元素，高度坍塌的问题
+2. 解决文字环绕在float 四周的情况
+3. 解决边距重叠问题 （父子，兄弟，空元素等）
