@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -10,7 +11,8 @@
       padding: 0;
       margin: 0;
     }
-    .parent{
+
+    .parent {
       height: 400px;
       width: 400px;
       padding: 5px;
@@ -20,7 +22,8 @@
       top: 10px;
       left: 10px;
     }
-    .son{
+
+    .son {
       background-color: aqua;
       height: 100px;
       width: 100px;
@@ -33,12 +36,14 @@
       left: 50px;
       overflow: auto;
     }
-    .child{
+
+    .child {
       width: 200px;
       height: 200px;
     }
   </style>
 </head>
+
 <body>
   <div class="parent">
     <div class="son">
@@ -49,12 +54,32 @@
   </div>
 
   <script>
-    var son = document.querySelector(".son")  
-    son.addEventListener("scroll",() => {
+    var son = document.querySelector(".son")
+    son.addEventListener("scroll", () => {
       //var child = document.querySelector(".child")
       console.log(son.scrollLeft);
     })
-    
+
+    function getUrlParams (url) {
+      const paramsRegex = /[?&]+([^=&]+)=([^&]*)/gi;
+      const params = {};
+      let match;
+      while (match = paramsRegex.exec(url)) {
+        params[match[1]] = match[2];
+      }
+      return params;
+    }
+
+    console.log(getUrlParams(location.search));
+
+    function urlParam () {
+        const param = {};
+        location.search.replace(/([^&=?]+)=([^&]+)/g, (m, $1, $2) => param[$1] = $2);
+        return param;
+      }
+      console.log(urlParam(location.search));
+
   </script>
 </body>
+
 </html>
