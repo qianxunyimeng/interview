@@ -173,13 +173,19 @@ Function.prototype._apply = function(ctx, array = []) {
 手写bind
 
 ```js
+// https://zhuanlan.zhihu.com/p/452907059
 Function.prototype._bind = function(ctx, ...args) {
   // 下面的this就是调用_bind的函数,保存给_self
   const _self = this
   // bind 要返回一个函数, 就不会立即执行了
   const newFn = function(...rest) {
-    // 调用 call 修改 this 指向
-    return _self.call(ctx, ...args, ...rest)
+    if(new.target){
+      return new _self(...args, ...rest)
+    }else{
+      // 调用 call 修改 this 指向
+      return _self.call(ctx, ...args, ...rest)
+    }
+    
   }
   if (_self.prototype) {
     // 复制源函数的prototype给newFn 一些情况下函数没有prototype，比如箭头函数
