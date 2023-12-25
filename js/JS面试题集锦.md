@@ -254,7 +254,17 @@ get：      读取时内部调用的函数
 set：        写入时内部调用的函数
 enumerable：  是否可以遍历,默认值 false 不可枚举
 configurable：  是否通过delete删除从而重新定义属性 默认值 false 不能删除
+
+// 通过字面量创建对象属性的方式,writable、enumerable、configurable 默认值为true
+// 通过Object.defineproperty创建对象属性的方式，writable、enumerable、configurable 默认值为false
+
+const demo = {
+  name:"sql"
+}
+Object.defineProperty(demo,'age',{})
+console.log(Object.getOwnPropertyDescriptors(demo))
 ```
+![Alt text](../images/js-面试集锦-8.1.1.png)
 
 ## 9.为什么会有跨域问题？怎么解决跨域？
 
