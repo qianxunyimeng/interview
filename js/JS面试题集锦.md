@@ -193,6 +193,7 @@ Function.prototype._bind = function(ctx, ...args) {
   }
   return newFn
 }
+
 ```
 
 ## 6.判断字符串是否是回文
