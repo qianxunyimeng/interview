@@ -587,7 +587,9 @@ Worker 线程无法读取本地文件，即不能打开本机的文件系统（f
 
 ## 16.document的load 和ready有什么区别？
 
-主要执行顺序的区别，load：页面资源加载完成； ready：是dom加载完成。
+主要执行顺序的区别，
+- load：表示页面或元素的所有资源(包括图片、样式表等)已经加载完成；
+- ready：表示DOM结构已经解析完毕,可以对DOM进行操作，但外部资源(如图片)可能尚未加载完毕。
 
 ## 17.理解constructor、prototype、__proto__和原型链
 
@@ -602,7 +604,7 @@ var person2 = new Person()
 上面代码Person( )就是person1和person2的构造函数。
 
 ② 可以通过对象.constructor拿到创建该实例对象的构造函数。
-![对象.constructor拿到创建该实例对象的构造函数](../images/js_001.awebp)
+![对象.constructor拿到创建该实例对象的构造函数](../images/js_001.webp)
 
 ```js
 console.log(person1.constructor) // 结果输出: [Function: Person]
