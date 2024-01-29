@@ -1596,12 +1596,12 @@ const throttle = (fn, delayTime) => {
     let args = arguments
     let _now = Date.now()
     let remainTime = delayTime - (_now - _start)
-    if(remainTime <=0) {
-      fn.apply(th,args)
+    clearTimeout(timerId)
+    if (remainTime <= 0) {
+      fn.apply(context, args)
       _start = Date.now()
-    }else{
-      clearTimeout(timerId)
-      setTimeout(()=>fn.apply(th, args), remainTime) 
+    } else {
+      timerId = setTimeout(() => fn.apply(th, args), remainTime)
     }
   }
 }
