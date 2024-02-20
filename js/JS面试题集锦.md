@@ -160,6 +160,7 @@ Function.prototype._call = function(ctx, ...args) {
 ```js
 // 只需要把第二个参数改成数组形式就可以了。
 Function.prototype._apply = function(ctx, array = []) {
+  // 这里的window 可以改成 globalThis,这是es11新提出的特性，指向全局this
   const o = ctx == undefined ? window : Object(ctx)
   //给context新增一个独一无二的属性以免覆盖原有属性
   const key = Symbol()
@@ -269,6 +270,7 @@ console.log(Object.getOwnPropertyDescriptors(demo))
 
 ## 9.为什么会有跨域问题？怎么解决跨域？
 
+https://juejin.cn/post/6844903882083024910
 跨域：指的是浏览器不能执行其他网站的脚本。它是由浏览器的同源策略造成的，是浏览器对javascript施加的安全限制。
 同源策略：是指协议，域名，端口都要相同，其中有一个不同都会产生跨域；
 
