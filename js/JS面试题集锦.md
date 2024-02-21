@@ -1,4 +1,5 @@
 # JS考点汇总
+
 - [JS考点汇总](#js考点汇总)
   - [1.typeof('abc')和typeof 'abc'都是string, 那么typeof是操作符还是函数](#1typeofabc和typeof-abc都是string-那么typeof是操作符还是函数)
   - [2.你理解的"use strict";是什么?使用它有什么优缺点？](#2你理解的use-strict是什么使用它有什么优缺点)
@@ -29,7 +30,7 @@
     - [offset系列](#offset系列)
       - [obj.offsetWidth](#objoffsetwidth)
       - [obj.offsetHeight](#objoffsetheight)
-      - [offsetLeft:](#offsetleft)
+      - [offsetLeft](#offsetleft)
       - [obj.offsetTop](#objoffsettop)
     - [client系列](#client系列)
     - [scroll系列](#scroll系列)
@@ -54,13 +55,10 @@
         - [Mark-sweep(标记清除) 和 Mark-compact（标记压缩） 算法（用于老生代垃圾回收机制）](#mark-sweep标记清除-和-mark-compact标记压缩-算法用于老生代垃圾回收机制)
   - [31. null和undefined的区别](#31-null和undefined的区别)
   - [32. 防抖和节流](#32-防抖和节流)
-  - [33. == 比较规则](#33--比较规则)
+  - [33. === 比较规则](#33--比较规则)
   - [34. A + B 加法运算规则](#34-a--b-加法运算规则)
   - [显示转换](#显示转换)
   - [35. 必包是什么，优缺点是什么](#35-必包是什么优缺点是什么)
-
-
-
 
 ## 1.typeof('abc')和typeof 'abc'都是string, 那么typeof是操作符还是函数
 
@@ -266,11 +264,12 @@ const demo = {
 Object.defineProperty(demo,'age',{})
 console.log(Object.getOwnPropertyDescriptors(demo))
 ```
+
 ![Alt text](../images/js-面试集锦-8.1.1.png)
 
 ## 9.为什么会有跨域问题？怎么解决跨域？
 
-https://juejin.cn/post/6844903882083024910
+<https://juejin.cn/post/6844903882083024910>
 跨域：指的是浏览器不能执行其他网站的脚本。它是由浏览器的同源策略造成的，是浏览器对javascript施加的安全限制。
 同源策略：是指协议，域名，端口都要相同，其中有一个不同都会产生跨域；
 
@@ -590,6 +589,7 @@ Worker 线程无法读取本地文件，即不能打开本机的文件系统（f
 ## 16.document的load 和ready有什么区别？
 
 主要执行顺序的区别，
+
 - load：表示页面或元素的所有资源(包括图片、样式表等)已经加载完成；
 - ready：表示DOM结构已经解析完毕,可以对DOM进行操作，但外部资源(如图片)可能尚未加载完毕。
 
@@ -614,8 +614,6 @@ console.log(person1.constructor) // 结果输出: [Function: Person]
 
 Person函数就是person1对象的构造函数。
 
-
-
 ③ Function函数和Object函数是JS内置对象，也叫内部类，JS自己封装好的类，所以很多莫名其妙、意想不到的设定其实无需过分纠结，官方动作，神仙操作。
 
 ④ 原型对象即实例对象自己构造函数内的prototype对象。
@@ -634,6 +632,7 @@ Person函数就是person1对象的构造函数。
 ![](../images/js-18-1-2.png)
 
 上面两幅图都是对原型链的剖析
+
 ```js
 function User() {}
 User.prototype.sayHello = function() {}
@@ -695,8 +694,8 @@ console.log(a === 1 && a === 2 && a === 3);//true
 
 ## 20. js继承实现方式及优缺点
 
-  1. 原型链继承
-   
+1. 原型链继承
+
 ```js
 function SuperType() {
     this.property = true;
@@ -742,8 +741,10 @@ alert(instance2.colors); //"red,blue,green,black"
 优点: 父类方法复用
 缺点: 父类的所有引用属性会被所有子类共享，更改一个子类的引用属性，其他子类也会受影响;子类型实例不能给父类型构造函数传参
 
-  2. 借用构造函数继承
+2. 借用构造函数继承
+
 使用父类的构造函数来增强子类实例，等同于复制父类的实例给子类
+
 ```js
 function  SuperType(){
     this.color=["red","green","blue"];
@@ -760,19 +761,23 @@ var instance2 = new SubType();
 alert(instance2.color);//"red,green,blue"
 
 ```
+
 核心代码是SuperType.call(this)，创建子类实例时调用SuperType构造函数，于是SubType的每个实例都会将SuperType中的属性复制一份。
 
-优点: 
+优点:
+
 - 可以在子类构造函数中向父类传参数
 - 父类的引用属性不会被共享
 
-
 缺点：
-- 子类不能访问父类原型上定义的方法（即不能访问Parent.prototype上定义的方法），因此所有方法属性都写在构造函数中，每次创建实例都会初始化
 
+- 只能继承父类的实例属性和方法，不能继承原型属性/方法(即不能访问Parent.prototype上定义的方法)
+- 无法实现函数复用，每个子类都有父类实例函数的副本(每次创建子类实例都初始化一个父类)，影响性能
+  
 3. 组合继承
-   
-   组合上述两种方法就是组合继承。用原型链实现对原型属性和方法的继承，用借用构造函数技术来实现实例属性的继承。
+
+组合上述两种方法就是组合继承。用原型链实现对原型属性和方法的继承，用借用构造函数技术来实现实例属性的继承。
+
 ```js
 function SuperType(name){
   this.name = name;
@@ -791,7 +796,7 @@ function SubType(name, age){
 
 // 继承方法
 // 构建原型链
-// 第一次调用SuperType()
+// 第一次调用SuperType() 将子类原型指向父类的原型
 SubType.prototype = new SuperType(); 
 // 重写SubType.prototype的constructor属性，指向自己的构造函数SubType
 SubType.prototype.constructor = SubType; 
@@ -812,6 +817,7 @@ instance2.sayAge(); //27
 ```
 
 优点
+
 - 父类的方法可以复用
 - 可以在Child构造函数中向Parent构造函数中传参
 - 父类构造函数中的引用属性不会被共享
@@ -824,8 +830,12 @@ instance2.sayAge(); //27
 实例对象instance1上的两个属性就屏蔽了其原型对象SubType.prototype的两个同名属性。所以，组合模式的缺点就是在使用子类创建实例对象时，其原型中会存在两份相同的属性/方法。
 
 4. 原型式继承
+
    对参数对象的一种浅复制
+   利用一个空对象作为中介，将某个对象直接赋值给空对象构造函数的原型。
+
 ```js
+// 改函数的作用和Object.create()方法完全相同
 function object(obj){
   function F(){}
   F.prototype = obj;
@@ -836,7 +846,7 @@ var person = {
   name: "Nicholas",
   friends: ["Shelby", "Court", "Van"]
 };
-
+//var anotherPerson = Object.create(person);
 var anotherPerson = object(person);
 anotherPerson.name = "Greg";
 anotherPerson.friends.push("Rob");
@@ -845,22 +855,25 @@ var yetAnotherPerson = object(person);
 yetAnotherPerson.name = "Linda";
 yetAnotherPerson.friends.push("Barbie");
 
-alert(person.friends);   //"Shelby,Court,Van,Rob,Barbie"
+console.log(person.friends);   //"Shelby,Court,Van,Rob,Barbie"
+console.log(yetAnotherPerson.friends); //"Shelby,Court,Van,Rob,Barbie"
 
 ```
 
 优点：
-  - 父类方法可复用
+
+- 父类方法可复用
   
 缺点:
 
-  - 父类的引用会被所有子类所共享,存在篡改的可能，例如上面的friends属性
-  - 类实例不能向父类传参
+- 父类的引用会被所有子类所共享,存在篡改的可能，例如上面的friends属性
+- 类实例不能向父类传参
   
   ES5中存在Object.create()的方法，能够代替上面的object方法。
 
 5. 寄生式继承
    在原型式继承的基础上，增强对象，返回构造函数
+
 ```js
 // 函数的主要作用是为构造函数新增属性和方法，以增强函数
 function createAnother(original){
@@ -880,7 +893,8 @@ anotherPerson.sayHi(); //"hi"
 ```
 
 缺点：
-  - 同原型式继承
+
+- 同原型式继承
   
 6. 寄生组合式继承
   
@@ -921,10 +935,12 @@ instance1.colors.push("2"); // ["red", "blue", "green", "2"]
 instance1.colors.push("3"); // ["red", "blue", "green", "3"]
 
 ```
+
 这个例子的高效率体现在它只调用了一次SuperType 构造函数，并且因此避免了在SubType.prototype 上创建不必要的、多余的属性。于此同时，原型链还能保持不变；因此，还能够正常使用instanceof 和isPrototypeOf()。
 这是最成熟的方法，也是现在库实现的方法
 
 优点：
+
 - 只调用一次父类构造函数
 - Child可以向Parent传参
 - 父类方法可以复用
@@ -933,6 +949,7 @@ instance1.colors.push("3"); // ["red", "blue", "green", "3"]
 寄生式组合继承可以算是引用类型继承的最佳模式
 
 ### es6 Class继承
+
 ```js
 class Parent {
   constructor(value) {
@@ -952,6 +969,7 @@ child.getValue() // 1
 child instanceof Parent // true
 
 ```
+
 class 实现继承的核心在于使用 extends 表明继承自哪个父类，并且在子类构造函数中必须调用 super，因为这段代码可以看成 Parent.call(this, value)。
 
 当然了，之前也说了在 JS 中并不存在类，<font color="red">class 的本质就是函数</font>。
@@ -972,7 +990,8 @@ class 实现继承的核心在于使用 extends 表明继承自哪个父类，�
 - 如果当前元素的父级元素中有CSS定位（position为absolute/relative），offsetParent取父级中最近的元素
 - <font color="red"><b>距离自己最近的并且具有定位属性(position为absolute/relative)的父元素</b></font>
 
-#### obj.offsetWidth 
+#### obj.offsetWidth
+
 指 obj 控件自身的绝对宽度，不包括因 overflow 而未显示的部分，也就是其实际占据的宽度，整型，单位：像素。包含垂直方向上滚动条的宽度。
 
 <font style="font-weight: bold">实际占据的宽度具体是怎末计算的受 box-sizing的影响。
@@ -983,15 +1002,17 @@ class 实现继承的核心在于使用 extends 表明继承自哪个父类，�
 如果： box-sizing: content-box;
 实际占据的宽度 = border + paddding + width</font>
 
-#### obj.offsetHeight 
+#### obj.offsetHeight
+
 指 obj 控件自身的绝对高度，不包括因 overflow 而未显示的部分，也就是其实际占据的高度，整型，单位：像素。
 
-#### offsetLeft:
+#### offsetLeft
+
 元素的左外边框至包含元素的左内边框之间的像素距离
 
 #### obj.offsetTop
-元素的上外边框至包含元素offsetParent的上内边框之间的像素距离
 
+元素的上外边框至包含元素offsetParent的上内边框之间的像素距离
 
 ### client系列
 
@@ -1004,6 +1025,7 @@ clientHeight：元素<font color="red"><b>内容区高度</b></font> + 山下内
 clientTop、clientLeft 这两个返回的是<font color="red"><b>元素周围边框的厚度</b></font>，一般它的值就是0。因为滚动条不会出现在顶部或者左侧
 
 ### scroll系列
+
 滚动大小：指的是包含滚动内容的元素的大小。
 scroll指滚动，包括这个元素没显示出来的实际宽度，包括padding，不包括滚动条、border
 ![scroll系列](../images/js-21-1-3.png)
@@ -1011,7 +1033,6 @@ scroll指滚动，包括这个元素没显示出来的实际宽度，包括paddi
 scrollLeft: 被隐藏在内容区域左侧的像素值，通过设置这个属性可以改变元素的滚动位置
 scrollTop：被隐藏在内容区域上方的像素值，通过这个属性可以改变元素的滚动位置
 scrollWidth和scrollHeight主要用于确定元素内容的实际大小
-
 
 ## 22.JS原始类型有哪些
 
@@ -1026,7 +1047,9 @@ scrollWidth和scrollHeight主要用于确定元素内容的实际大小
 - bigint
 
 ## 23.改造下面的代码，使之输出0 - 9
+
 js代码如下
+
 ```js
 for (var i = 0; i < 10; i++) {
     setTimeout(() => {
@@ -1034,12 +1057,14 @@ for (var i = 0; i < 10; i++) {
     }, 1000)
 }
 ```
+
 原始输出：
 ![](../images/js-23-1.png)
 
 修改方法如下
 
 方法一: 使用let作用域
+
 ```js
 for (let i = 0; i< 10; i++){
   setTimeout(() => {
@@ -1050,6 +1075,7 @@ for (let i = 0; i< 10; i++){
 
 方法二: 闭包
 1秒钟后，一次性输出1到9的数字
+
 ```js
 for (var i = 0; i < 10; i++) {
     (i => {
@@ -1063,6 +1089,7 @@ for (var i = 0; i < 10; i++) {
 方法三: IFEE立即执行函数
 
 立即输出1到9数字，不会延迟
+
 ```js
 for (var i = 0; i < 10; i++) {
     setTimeout((() => {
@@ -1084,6 +1111,7 @@ for (let i = 0; i < 10; i++) {
 ```
 
 方法五: let或const临时变量
+
 ```js
 for (var i = 0; i < 10; i++) {
   const _i = i
@@ -1092,7 +1120,9 @@ for (var i = 0; i < 10; i++) {
   }, 1000)
 }
 ```
+
 方法六: try catch
+
 ```js
 for (var i = 0; i < 10; i++) {
     try {
@@ -1106,6 +1136,7 @@ for (var i = 0; i < 10; i++) {
 ```
 
 ## 24. var、let、const的区别
+
 var、let、const三者区别可以围绕下面五点展开
 变量提升
 暂时性死区
@@ -1121,27 +1152,33 @@ let 和 const 定义的变量也会被提升，但是不会被初始化，不能
 当进入let变量的作用域时，会立即给它创建存储空间，但是不会对它进行初始化。
 
 变量的赋值分为3个阶段：
+
 1. 创建变量：在内存中开辟空间
 2. 初始化变量: 变量初始化为undefined
 3. 真正赋值:
 
 ###### 关于 let,var和function
+
 - let创建阶段被提升
 - var创建和初始化被提升
 - function创建、初始化、赋值都被提升
 
 ##### 暂时性死区
+
 let和const存在暂时性死区，只有等到声明变量的代码出现，才可以获取和使用该变量。
 
 ##### 块级作用域
+
 var不存在块级作用域
 let和const存在块级作用域
 
 ##### 重复声明
+
 var 允许重复声明
 let和const不允许重复声明
 
 ##### 修改声明的变量
+
 var和let可以，const不可以
 
 ## 25.setTimeout、setInterval 和 requestAnimationFrame 之间的区别
@@ -1158,6 +1195,7 @@ requestAnimationFrame 比起 setTimeout、setInterval的优势主要有两点：
 ## 26.手写Promise
 
 基础版 实现reslove,reject,then
+
 ```js
 
 class MyPromise {
@@ -1386,8 +1424,8 @@ export default MyPromise
 
 ```
 
-
 基础版本的then，无法实现then的链式调用，面试时写出 基础版本的then已经可以了
+
 ```js
 then(onFulfilled, onRejected){ 
    // 确保onFulfilled和onRejected 是函数类型
@@ -1477,6 +1515,7 @@ Function.prototype.myBind = function (context) {
 ```
 
 ## 28. 手写new
+
 ```js
 function create () {
   let obj = {}
@@ -1497,6 +1536,7 @@ console.log(create(Person,'张三'))
 ## 29. new的工作原理、new和字面量创建对象的区别？
 
 new的工作原理：
+
 1. 创建一个空对象，构造函数中的this会指向这个对象
 
 2. 这个新对象会被链接到原型
@@ -1506,13 +1546,15 @@ new的工作原理：
 4. 如果构造函数中没有返回新对象，那么返回this，即创建新对象；否则，返回构造函数中返回的对象。
 
 new和字面量创建对象的区别：
+
 1. 字面量创建对象，不会调用Object构造函数，简洁且性能更好；
 
 2. new Object() 方式创建对象本质上是方法调用，涉及到在proto链中遍历该方法，当找到该方法后，又会生产方法调用必须的 堆栈信息，方法调用结束后，还要释放该堆栈，性能不如字面量的方式。
 
-
 ## 30. V8 下的垃圾回收机制是怎么样的？
+
 ##### 回收策略
+
 v8垃圾回收策略主要采用分代式回收机制，根具对象存活时间进行分代，将内存分为新生代和老生代两块内存空间。
 
 然后将对象存活时间较短的分配到新生代内存中，新建的对象也是优先分配到新生代内存中，将对象存活时间较长的分配到老生代内存中，然后两个不同的生代采用不同的算法进行垃圾回收。
@@ -1520,6 +1562,7 @@ v8垃圾回收策略主要采用分代式回收机制，根具对象存活时间
 #### 回收算法
 
 ##### Scavenge算法（用于新生代垃圾回收机制）
+
 在分代的基础上，新生代中的对象主要通过Scavenge算法进行垃圾回收。而在Scavenge的具体实现中，主要采用了Cheney算法。
 
 Cheney算法是一种采用<font color="red">复制的方式实现垃圾回收</font>的算法。
@@ -1537,14 +1580,15 @@ Scavenge由于只复制存活的对象，并且对于生命周期短的场景存
 
 缺点：由于只能使用堆内存的一半，所以不适用大规模的垃圾回收机制中，是典型的牺牲空间换时间的算法。
 
-
 ##### Mark-sweep(标记清除) 和 Mark-compact（标记压缩） 算法（用于老生代垃圾回收机制）
+
 当一个对象经过多次复制依然存活时，它将会被认为是生命周期较长的对象。
 这种较长生命周期的对象随后会被移动到老生代中，采用新的算法进行管理。
 对象从新生代中移动到老生代中的过程称为晋升。
 
 晋升条件：
 对象晋升的条件主要有两个。
+
 1. 对象在新生代期间是否经历过Scavenge回收；
 2. 是To空间的内存占用比超过限制（To空间内存消耗是否超过25%，如果超过对象直接晋升）。
 
@@ -1569,7 +1613,6 @@ Mark-Sweep与Mark-Compact两者为策略递进关系，当空间不足以对从�
 
 undefined: 已声明，但并未赋值
 null: 已声明已赋值，值是null
-
 
 ## 32. 防抖和节流
 
@@ -1600,7 +1643,7 @@ const throttle = (fn, delayTime) => {
     let remainTime = delayTime - (_now - _start)
     clearTimeout(timerId)
     if (remainTime <= 0) {
-      fn.apply(context, args)
+      fn.apply(th, args)
       _start = Date.now()
     } else {
       timerId = setTimeout(() => fn.apply(th, args), remainTime)
@@ -1609,9 +1652,9 @@ const throttle = (fn, delayTime) => {
 }
 ```
 
-## 33. == 比较规则
+## 33. === 比较规则
 
-用 == 比较两端，具体规则如下
+用 === 比较两端，具体规则如下
 
 1. 两端类型相同，比较值
 2. 两端存在NAN,返回false
@@ -1631,16 +1674,24 @@ const throttle = (fn, delayTime) => {
 
 对象强制转换规则看上一题 【对象转原始类型的步骤】
 
-
 ## 显示转换
+
 ```
  Number([]) // 0
  Number([5]) // 5
  Number([5,6]) // NAN,length > 1 就会NAN,length == 1 等价于arr[0]
+ Number(null) // 0
+ Number(undefined) // NaN
+ Number('') // 0
+ Number('123') // 123
+ Number('123abc') // NaN
+ Number('abc123') // NaN
+ Number('123.456') // 123.456
 
 ```
 
 ## 35. 必包是什么，优缺点是什么
+
 闭包是一种特殊的函数，它可以访问其词法作用域之外的变量。简单来说，闭包是由函数及其相关的引用环境组合而成的实体。
 
 优点如下
