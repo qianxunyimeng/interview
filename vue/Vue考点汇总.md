@@ -111,7 +111,7 @@ Vue3
 
 ## 8. Vue2 数据定义不在data里有什么问题，有什么解决方案
 
-不在data里，属性就不是响应式的，可以用Vue.set(target,key,val)或 this.$.set() 将属性转换成响应式的
+不在data里，属性就不是响应式的，可以用Vue.set(target,key,val)或 this.$set(target,key,val) 将属性转换成响应式的
 
 ## 9. Vue2是如何监测数组数据的变化
 
@@ -145,7 +145,6 @@ vm.$set(vm.items, indexOfItem, newValue)
 // Array.prototype.splice
 vm.items.splice(indexOfItem, 1, newValue)
 ```
-
 
 ## 10. Vue3组件通信方式
 
