@@ -86,7 +86,6 @@ destroyed     -> onUnmounted 组件卸载之前执行的函数。
 3. 父组件更新过程：父 beforeUpdate -> 父 updated
 4. 销毁过程：父beforeDestroy->子beforeDestroy->子destroyed->父destroyed
 
-
 ## 6. 使用Vue2写的项目如何升级为Vue3？需要考虑哪些因素？
 
 Vue3不支持IE11
@@ -107,7 +106,6 @@ vue2
 Vue3
 通过Proxy代理拦截对data任意属性的操作(13种),包括对属性值的读写，添加，删除等等...
 通过Reflet动态对代理对象相应属性进行相应的操作。
-
 
 ## 8. Vue2 数据定义不在data里有什么问题，有什么解决方案
 
@@ -152,7 +150,12 @@ vm.items.splice(indexOfItem, 1, newValue)
 props父组件传递数据给子组件
 emit子组件以方发派发的方式触发
 
-方式二：expose / ref
+父传子：props传递的是单个属性值
+子传父：props传递的是一个方法，子组件调用该方法，将数据传递给父组件
+
+方式二：$refs和$parent
+$refs：父组件通过this.$refs.childRef来访问子组件实例
+$parent：子组件通过this.$parent来访问父组件实例
 父组件获取子组件的属性或者调用子组件方法
 
 ```js
@@ -195,6 +198,54 @@ emit子组件以方发派发的方式触发
 </script>
 
 ```
+
+方式三：v-model
+
+v-model用在表单组件上，实现双向绑定
+
+在vue2中，v-model 实质上是 :value 和 @input 的语法糖
+
+```vue
+<input v-model="username"/>
+<input :value="username" @input="username = $event.target.value"/>
+```
+
+在vue3中，v-model 实质上是 :modelValue 和 @update:modelValue 的语法糖
+
+```vue
+<input v-model="username"/>
+<input :modelValue="username" @update:modelValue="username = $event"/>
+```
+
+自定义一个input组件
+
+```vue
+<template>
+    <input :value="modelValue" @input="$emit('update:modelValue', $event.target.value)">
+</template>
+<script setup>
+    // vue 3.4 新增了defineModel
+    defineProps(["modelValue"])
+    defineEmits(["update:modelValue"])
+</script>
+```
+
+```vue
+<template>
+    <my-input v-model="username"></my-input>
+</template>
+<script setup>
+    import myInput from "./myInput.vue"
+    import { ref } from "vue"
+    const username = ref("")
+</script>
+
+方式三底层用的还是方式一
+
+modelValue可以换成其它的名字
+v-model：name  
+defineProps(["name"])
+defineEmits(["update:name"])
   
 方式四：attrs
 attrs：包含父作用域里除 class 和 style 除外的非 props 属性集合
@@ -209,7 +260,8 @@ attrs：包含父作用域里除 class 和 style 除外的非 props 属性集合
     const msg2 = ref("2222")
 </script>
 
-// Child.vue 接收
+// Child.vue 接收 子组件给孙组件传递了很多没有接收的props
+<grand-child v-bind="$attrs"></grand-child>
 <script setup>
     import { defineProps, useContext, useAttrs } from "vue"
     // 3.2版本不需要引入 defineProps，直接用
@@ -224,6 +276,14 @@ attrs：包含父作用域里除 class 和 style 除外的非 props 属性集合
     // 方法二 适用于 Vue3.2版本
     const attrs = useAttrs()
     console.log(attrs) // { msg2:"2222", title: "3333" }
+</script>
+
+// GrandChild.vue
+<script setup>
+    import { useAttrs } from "vue"
+    const props = defineProps({
+        msg2: String // 222
+    })
 </script>
 
 ```
@@ -260,7 +320,6 @@ Vue3 中没有了 EventBus 跨组件通信，但是现在有了一个替代的�
 ## 12. 说说你对指令的理解
 
 指令 (Directives) 是带有 v- 前缀的特殊 attribute。指令 attribute 的值预期是单个 JavaScript 表达式 (v-for 是例外情况，稍后我们再讨论)。指令的职责是，当表达式的值改变时，将其产生的连带影响，响应式地作用于 DOM。
-
 
 ## 13. 自定义指令的生命周期（钩子函数）有哪些
 
