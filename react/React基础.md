@@ -25,7 +25,7 @@ React缺点
 
 注意: React.createClass 在16.0以后的版本中被废弃
 
-区别： 
+区别:
 
 ## 2.props为什么是只读的
 
@@ -66,6 +66,7 @@ Demo.propTypes = {
 
 在react 18版本中
 废弃的生命周期
+
 - componentWillMount
 - componentWillReceiveProps
 - componentWillUpdate
@@ -114,6 +115,7 @@ react 会自顶向下全diff。vue会跟踪每一个组件的依赖关系,不需
 PureComponent其实就是一个继承自Component的子类，会自动加载shouldComponentUpdate函数。当组件需要更新的时候，shouldComponentUpdate会对组件的props和state进行一次浅比较。如果props和state都没有发生变化，那么render方法也就不会出发，当然也就省去了之后的虚拟dom的生成和对比，在react性能方面得到了优化。
 
 区别：
+
 1. PureComponent会自动执行shouldComponentUpdate函数，通过shallowEqual的浅对比，实现react的性能优化。
 2. PureComponent不仅会影响本身，而且会影响子组件，所以PureComponent最佳情况是展示组件
    1. 假如父组件是继承自PureComponent,而子组件是继承自Component，那么如果当父组件的props或者是state没有变化而子组件的props或者state有变化，那么此时子组件也不会有更新，因为子组件受到父组件的印象，父组件没有更新。
@@ -132,6 +134,7 @@ createContext： 16版本开始提供的Api
 [知乎](https://zhuanlan.zhihu.com/p/60307571)
 
 ### react 16之前的架构
+
 - reconciler：调和（也叫协调）器。协调可以理解为：将以虚拟形式存在的 VDOM 与真实 DOM 同步的一个过程（React 官方对 reconciler 的解释更偏向于源码角度）。所以<font color="red">协调器的一个核心就是 diff，React15 的协调也叫栈调和（Stack reconciler）</font>。
 - renderer：渲染器。React 组件发生更新时，调和器通知渲染器将变化的 VDOM 重新渲染到页面。
 
@@ -172,7 +175,7 @@ Concurrent Mode 是 React 的一组新功能。可帮助应用保持响应，并
 ## 13. 类组件绑定this的几种方式
 
   1. 构造器内部使用bind绑定
-   
+  
   ```js
   import React, {Component} from 'react'
 ​
@@ -200,6 +203,7 @@ Concurrent Mode 是 React 的一组新功能。可帮助应用保持响应，并
    优点: 避免每次渲染都需要重新绑定
 
   2. 在render内部使用bind绑定
+
    ```js
      import React, {Component} from 'react'
 ​
@@ -224,6 +228,7 @@ Concurrent Mode 是 React 的一组新功能。可帮助应用保持响应，并
    ```
 
    3. render内部调用时使用箭头函数包裹
+
    ```js
     class Test extends React.Component {
       constructor (props) {
@@ -245,6 +250,7 @@ Concurrent Mode 是 React 的一组新功能。可帮助应用保持响应，并
     }
    ```
    4. 函数定义时使用箭头函数
+
    ```js
     //1.在箭头函数中执行函数
     class Test extends React.Component {
