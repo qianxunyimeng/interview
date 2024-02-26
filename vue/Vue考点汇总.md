@@ -214,7 +214,7 @@ v-model用在表单组件上，实现双向绑定
 
 ```vue
 <input v-model="username"/>
-<input :modelValue="username" @update:modelValue="username = $event"/>
+<input :modelValue="username" @update:modelValue="username = $event.target.value"/>
 ```
 
 自定义一个input组件
@@ -310,6 +310,8 @@ inject：在任何后代组件中接收想要添加在这个组件上的数据�
 
 方式六： mitt.js
 Vue3 中没有了 EventBus 跨组件通信，但是现在有了一个替代的方案 mitt.js，原理还是 EventBus
+
+方式七: vuex或pinia
 
 ## 11. Vue2组件通信方式
 
@@ -440,11 +442,11 @@ watchEffet：
 1. 永远不要把 v-if 和 v-for 同时用在同一个元素上
 2. 如果避免出现这种情况，则在外层嵌套template（页面渲染不生成dom节点），在这一层进行 v-if 判断，然后在内部进行 v-for 循环
 
-```vue
-<template v-if="isShow">
-    <p v-for="item in items">
-</template>
-```
+  ```vue
+  <template v-if="isShow">
+      <p v-for="item in items">
+  </template>
+  ```
 
 3. 如果条件出现在循环内部，可通过计算属性computed提前过滤掉那些不需要显示的项
 
@@ -512,7 +514,7 @@ Vue.config.errorHandler = function (err, vm, info) {
 
 ## 21. SPA首屏加载速度慢的怎么解决？
 
-（1）较少入口文件体积：如路由懒加载
+（1）减少入口文件体积：如路由懒加载
 
 （2）静态资源本地缓存：如采用http缓存、localStorage等
 
@@ -708,7 +710,6 @@ const router = new VueRouter({
 
 数据驱动和组件系统
 
-
 ## 32. 你了解什么是高阶组件吗？可否举个例子说明下？
 
 所谓高阶组件其实就是一个高阶函数, 即返回一个组件函数的函数，Vue中怎么实现呢？ 注意 高阶组件有如下特点
@@ -717,7 +718,6 @@ const router = new VueRouter({
 - 高阶组件(HOC)不关心你传递的数据(props)是什么，并且新生成组件不关心数据来源
 - 高阶组件(HOC)接收到的 props 应该透传给被包装组件即直接将原组件prop传给包装组件
 - 高阶组件完全可以添加、删除、修改 props
-
 
 Base.vue
 
@@ -797,7 +797,7 @@ vue3中结合vue-router时变化较大，之前是keep-alive包裹router-view，
 
 缓存后如果要获取数据，解决方案可以有以下两种：
 
-```
+```js
 1.beforeRouteEnter：在有vue-router的项目，每次进入路由的时候，都会执行beforeRouteEnter
 
  beforeRouteEnter(to, from, next){
@@ -1083,6 +1083,7 @@ function initState (vm) {
     }
   }
 ```
+
 以上为vue的部分源码，可以看出判断顺序：
 props > methods > data > computed > watch
 因此如果有同名属性或方法，会被覆盖
@@ -1160,7 +1161,6 @@ history 模式的实现，主要是 HTML5 标准发布的两个 API，`pushState
 刷新页面时，hash 模式可以正常加载到 hash 值对应的页面，而 history 没有处理的话，会返回 404，一般需要后端将所有页面都配置重定向到首页路由
 在兼容性上，hash 可以支持低版本浏览器和 IE
 
-
 ### 说一下  `router` 与 `route` 的区别
 
 $route 对象表示当前的路由信息，包含了当前 URL 解析得到的信息。包含当前的路径，参数，query 对象等。
@@ -1213,7 +1213,7 @@ $router 对象常用的方法有：
 
 ### 组件级守卫详解
 
-beforeRouteEnter（不！能！获取组件实例 this ！！！）
+beforeRouteEnter(不！能！获取组件实例 this!!!)
 ![beforeRouteEnter](../images/vue-43-1.png)
 
 beforeRouteUpdate
@@ -1296,9 +1296,9 @@ keep-alive实现缓存的核心代码就在这个钩子函数里。
 2. 调用getFirstComponentChild方法获取第一个子组件，获取到该组件的name，如果有name属性就用name，没有就用tag名。
 3. 接下来会将这个name通过include与exclude属性进行匹配，匹配不成功（说明不需要进行缓存）则不进行任何操作直接返回这个组件的 vnode（vnode是一个VNode类型的对象），否则的话走下一步缓存
 4. 缓存机制：接下来的事情很简单，根据key在this.cache中查找，如果存在则说明之前已经缓存过了，直接将缓存的vnode的componentInstance（组件实例）覆盖到目前的vnode上面。否则将vnode存储在cache中。最后返回vnode（有缓存时该vnode的componentInstance已经被替换成缓存中的了）
-/* 如果命中缓存，则直接从缓存中拿 vnode 的组件实例 */
+
 ```js
-if (cache[key]) {
+if (cache[key]) {  /* 如果命中缓存，则直接从缓存中拿 vnode 的组件实例 */
     vnode.componentInstance = cache[key].componentInstance
     /* 调整该组件key的顺序，将其从原来的地方删掉并重新放在最后一个 */
     remove(keys, key)
@@ -1346,7 +1346,6 @@ Watcher 创建好后，vue 会使用代理模式，将计算属性挂载到组�
 由于依赖同时会收集到组件的 Watcher，因此组件会重新渲染，而重新渲染时又读取到了计算属性，由于计算属性目前已为 dirty，因此会重新运行 getter 进行运算
 而对于计算属性的 setter，则极其简单，当设置计算属性时，直接运行 setter 即可。
 
-
 ## 48. Vue complier 的实现原理
 
 在使用 vue 的时候，我们有两种方式来创建我们的 HTML 页面，第一种情况，也是大多情况下，我们会使用模板 template 的方式，因为这更易读易懂也是官方推荐的方法；第二种情况是使用 render 函数来生成 HTML，它比 template 更接近最终结果。
@@ -1356,5 +1355,3 @@ complier 主要分为 3 大块：
 - parse：接受 template 原始模板，按着模板的节点和数据生成对应的 ast
 - optimize：遍历 ast 的每一个节点，标记静态节点，这样就知道哪部分不会变化，于是在页面需要更新时，通过 diff 减少去对比这部分DOM，提升性能
 - generate 把前两步生成完善的 ast，组成 render 字符串，然后将 render 字符串通过 new Function 的方式转换成渲染函数
-
-
