@@ -916,6 +916,7 @@ SuperType.prototype.sayName = function(){
 
 // 借用构造函数传递增强子类实例属性（支持传参和避免篡改）
 function SubType(name, age){
+  //构造函数式继承--子类构造函数中执行父类构造函数
   SuperType.call(this, name);
   this.age = age;
 }
@@ -924,6 +925,7 @@ function SubType(name, age){
 inheritPrototype(SubType, SuperType);
 
 // 新增子类原型属性
+// 核心：因为是对父类原型的复制，所以不包含父类的构造函数，也就不会调用两次父类的构造函数造成浪费
 SubType.prototype.sayAge = function(){
   alert(this.age);
 }
@@ -1074,7 +1076,7 @@ for (let i = 0; i< 10; i++){
 ```
 
 方法二: 闭包
-1秒钟后，一次性输出1到9的数字
+1秒钟后，一次性输出1到9的数字,
 
 ```js
 for (var i = 0; i < 10; i++) {
