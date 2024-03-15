@@ -23,7 +23,7 @@
   - [16.document的load 和ready有什么区别？](#16document的load-和ready有什么区别)
   - [17.理解constructor、prototype、\_\_proto\_\_和原型链](#17理解constructorprototype__proto__和原型链)
   - [18.什么是原型和原型链](#18什么是原型和原型链)
-  - [19.如何实现a===1 \&\& a===2 \&\& a===3返回true？](#19如何实现a1--a2--a3返回true)
+  - [19.如何实现a==1 \&\& a==2 \&\& a==3返回true？](#19如何实现a1--a2--a3返回true)
   - [20. js继承实现方式及优缺点](#20-js继承实现方式及优缺点)
     - [es6 Class继承](#es6-class继承)
   - [21.offset、client、scroll系列理解](#21offsetclientscroll系列理解)
@@ -663,7 +663,24 @@ console.log(Function.prototype.__proto__ === Object.prototype); // true
 
 ```
 
-## 19.如何实现a===1 && a===2 && a===3返回true？
+## 19.如何实现a==1 && a==2 && a==3返回true？
+
+方法1:
+
+```js
+const a = {
+  value: 1,
+  valueOf: function () { 
+    console.log('valueOf');
+    return this.value++
+  }
+}
+
+//console.log(a == 1 && a == 2 && a == 3) //true
+console.log(a === 1 && a === 2 && a === 3) //false
+```
+
+方法2:
 
 ```js
 Object.defineProperty(this, 'a', {
@@ -671,16 +688,21 @@ Object.defineProperty(this, 'a', {
         return this.value = this.value ? (this.value += 1) : 1
     }
 })
-console.log(a===1 && a===2 && a===3) //true
+//console.log(a == 1 && a == 2 && a == 3) //true
+console.log(a === 1 && a === 2 && a === 3) //true  
 ```
+
+方法3:
 
 ```js
 let a = new Proxy({ i: 0 }, {
     get: (target, name) => name === Symbol.toPrimitive ? () => ++target.i : target[name],
 });
-console.log(a == 1 && a == 2 && a == 3);    // true
-
+// console.log(a == 1 && a == 2 && a == 3) //true
+console.log(a === 1 && a === 2 && a === 3) //false
 ```
+
+方法4:
 
 ```js
 let _a= 1;
@@ -689,8 +711,14 @@ Reflect.defineProperty(this, 'a', {
         return _a++;
     }
 });
-console.log(a === 1 && a === 2 && a === 3);//true
+console.log(a == 1 && a == 2 && a == 3) //true
+console.log(a === 1 && a === 2 && a === 3) //true
 ```
+
+综上所述
+用 == 判断，以上方法都可以
+用 === 判断，只有方法2和方法4可以
+
 
 ## 20. js继承实现方式及优缺点
 
