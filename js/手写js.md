@@ -92,3 +92,51 @@ function deepClone (obj) {
   return obj
 }
 ```
+
+## 3. 实现栈结构
+
+```js
+
+class MyStack { 
+  constructor() { 
+    this.stack = []
+  }
+
+  // 添加元素到栈顶
+  push (item) { 
+    // 在数组末尾添加元素来实现栈顶添加元素
+    this.stack.push(item)
+  }
+
+  // 弹出栈顶元素
+  pop () { 
+    // 数字末尾删除元素来实现栈顶弹出元素
+    return this.stack.pop()
+  }
+
+  // 返回栈顶元素，但不会删除
+  peek () {
+    return this.stack[this.size() - 1]
+  }
+
+  // 栈大小
+  size () { 
+    return this.stack.length
+  }
+  // 判断栈是否为空
+  isEmpty () {
+    return this.size() === 0
+  }
+
+}
+
+const stack = new MyStack()
+stack.push(10)
+stack.push(20)
+stack.push(30)
+console.log(stack.peek()) // 30
+console.log(stack); // MyStack { stack: [ 10, 20, 30 ] }
+console.log(stack.pop()); // 30
+console.log(stack); // MyStack { stack: [ 10, 20 ] }
+
+```

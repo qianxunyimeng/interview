@@ -182,6 +182,8 @@ Shadow DOM是HTML的一个规范 ，它允许浏览器开发者封装自己的HT
 
 ## 9.跨页面通信解决方案
 
+[在线案例](https://alienzhou.github.io/cross-tab-communication/)
+
 ### 方案一 storage
 
 WindowEventHandlers.onstorage 属性包含一个在 storage 事件触发时运行的事件处理程序。当更改存储时会触发事件处理程序。
@@ -310,6 +312,24 @@ Service Worker 是一个可以长期运行在后台的 Worker，能够实现与�
 </script>
 ```
 
+```js
+/* ../util.sw.js Service Worker 逻辑 */
+self.addEventListener('message', function (e) {
+    console.log('service worker receive message', e.data);
+    e.waitUntil(
+        self.clients.matchAll().then(function (clients) {
+            if (!clients || clients.length === 0) {
+                return;
+            }
+            clients.forEach(function (client) {
+                client.postMessage(e.data);
+            });
+        })
+    );
+});
+
+```
+
 ```html
 /* 监听安装事件，install 事件一般是被用来设置你的浏览器的离线缓存逻辑 */
 this.addEventListener('install', function (event) {
@@ -377,7 +397,7 @@ worker.port.start();
  
  console.log('worker.port', worker.port);
  
- worker.port.start();
+ //worker.port.start(); 如果使用addEventListener监听message的话，需要调用start()
  
  // 监听消息
  worker.port.onmessage = function (val) {
@@ -399,7 +419,7 @@ sharedWorker.js
 ```js
 let a = 666;
 console.log('shared-worker');
-onconnect = function (e) {
+self.onconnect = function (e) {
  const port = e.ports[0];
  console.log('shared-worker connect');
  
@@ -410,7 +430,8 @@ onconnect = function (e) {
  
  port.postMessage(a);
  
- port.onmessage = () => {
+ port.onmessage = (event) => {
+  console.log("接收到消息: ",event.data)
    port.postMessage(++a);
  };
  console.log('当前点赞次数:', a);
