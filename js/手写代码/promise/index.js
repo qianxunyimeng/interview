@@ -334,8 +334,8 @@ class MyPromise {
       return reject(new TypeError('Argument is not a function'))
     }
     return new MyPromise((resolve, reject) => {
-      //resolve(func())
-      MyPromise.resolve(func()).then(resolve, reject)
+      resolve(func())
+      //MyPromise.resolve(func()).then(resolve, reject)
     });
   }
 
