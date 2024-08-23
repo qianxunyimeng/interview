@@ -103,7 +103,7 @@ new 操作符会返回一个对象，所以我们需要在内部创建一个对�
 ```js
 function create(Con, ...args) {
   let obj = {}
-  Object.setPrototypeOf(obj, Con.prototype)
+  Object.setPrototypeOf(obj, Con.prototype)  // 以上两行可以使用 let obj = Object.create(Con.prototype) 代替
   let result = Con.apply(obj, args)
   return result instanceof Object ? result : obj
 }
