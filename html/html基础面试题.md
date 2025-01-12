@@ -12,6 +12,71 @@
     当浏览器解析到适用于 src 属性的标签（比如 <script> 和 <img>）时，会暂停其他资源的下载和处理，直到将该资源加载、编译（如果是 JavaScript）、执⾏（如果是脚本）完成。这种方式称为阻塞加载，所以⼀般建议将 JavaScript 脚本放在页面底部。
     而当浏览器识别到适用于 href 属性的标签（比如 <a> 和 <link>）时，会并⾏下载资源，不会停⽌对当前⽂档的处理。这种方式称为非阻塞加载，浏览器可以同时处理超链接或引入样式表。
 
+## web页面生命周期
+
+1. DOMContentLoaded
+DOMContentLoaded在页面的 HTML 和 DOM 树加载完成后触发，但在所有外部资源（如图像、样式表、脚本等）加载完成之前。这使得我们可以在 DOM 加载完成后执行一些操作，例如初始化页面元素、注册事件监听器、执行一些初始的 JavaScript 逻辑等。
+
+DOMContentLoaded事件不会冒泡，不可以取消默认行为。
+
+应用场景
+- 初始化页面元素
+- 注册事件监听器
+- 发送初始的 AJAX 请求
+- 执行一些初始的 JavaScript 逻辑
+
+```javascript
+document.addEventListener('DOMContentLoaded', function() {
+  // DOMContentLoaded 事件触发后执行的逻辑
+  console.log('DOMContentLoaded event triggered');
+});
+```
+
+2. load
+load 事件在整个页面及其所有外部资源（如图像、样式表、脚本等）加载完成后触发。这意味着页面的所有内容已经可用，并且可以执行与页面渲染和交互相关的操作。
+load事件不会冒泡，不可以取消默认行为。
+
+应用场景
+- 执行一些需要页面完全加载后才能进行的操作
+- 初始化和配置第三方库和插件
+- 启动动画或其他视觉效果
+
+```javascript
+window.addEventListener('load', function() {
+  // load 事件触发后执行的逻辑
+  console.log('load event triggered');
+});
+```
+
+3. beforeunload
+beforeunload 事件在页面即将被卸载（关闭、刷新、导航到其他页面等）之前触发。它通常用于询问用户是否确定离开当前页面，并可以在事件处理函数中执行一些清理操作。
+beforeunload事件不会冒泡，可以取消默认行为。
+
+应用场景
+- 提示用户保存未保存的数据或离开前的确认提示
+- 执行清理操作，如取消未完成的 AJAX 请求、释放资源等
+
+```javascript
+window.addEventListener('beforeunload', function(event) {
+  // beforeunload 事件触发时执行的逻辑
+  // 可以在这里提示用户保存未保存的数据或离开前的确认提示
+  event.preventDefault(); // 阻止默认的 beforeunload 行为
+  event.returnValue = ''; // Chrome 需要设置 returnValue 属性
+});
+```
+4. unload
+unload 事件在页面被卸载后触发，适用于执行最后的清理操作。
+
+应用场景
+- 释放页面所使用的资源，如清除定时器、取消事件监听器等
+- 发送最后的统计数据或日志
+
+```javascript
+window.addEventListener('unload', function() {
+  // unload 事件触发后执行的逻辑
+  console.log('unload event triggered');
+});
+```
 ## async和defer
 
   普通的script引入js，js的下载和执行都会阻塞html文档的解析渲染
@@ -19,7 +84,7 @@
   |  script标签  |   是否阻塞html   |    执行时机    |    执行顺序    |      DOMContentLoaded回调  |
   | ---         |   ----           |     ----          |  ---           |  ---                       |
   | script      |   阻塞           |    下载完立即执行     |   按顺序(引入书序、书写顺序)执行    | 等待(等所有的script执行完毕才会触发 DOMContentLoaded回调)     |
-  | async       |   下载阻塞，执行不阻塞  |   下载完立即执行      |  无序(谁先加载完谁先执行)     |  不等待    |
+  | async       |   下载不阻塞，执行阻塞  |   下载完立即执行(执行期间暂停html的解析和渲染)      |  无序(谁先加载完谁先执行)     |  不等待    |
   | defer       |   下载、执行都不阻塞    |   等dom渲染完毕，同时等待所有的defer下载完毕，<br>再依次执行 |  按顺序(引入书序、书写顺序)执行     |  等待(等所有的script执行完毕才会触发 DOMContentLoaded回调)    |
 
 
