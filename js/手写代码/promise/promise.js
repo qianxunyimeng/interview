@@ -150,3 +150,18 @@ p.then(
   res => { console.log("promise 完成4", res) },
   err => { console.log("promise 失败4", err) }
 )
+
+function f1 () { 
+  return Promise.reject("hah")
+}
+
+
+async function mian () { 
+  try {
+    await f1()
+  } catch (error) {
+    console.log("异常",error)
+  }
+}
+
+mian()
