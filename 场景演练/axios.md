@@ -189,6 +189,80 @@ export { PendingAxios }
 
 ```
 
+AbortAxios.ts
+```ts
+import type{ AxiosRequestConfig } from 'axios'
+import { generateReqKey } from './util'
+
+/**
+ * 用于存储控制器
+ */
+const pendingMap = new Map<string, AbortController>()
+
+
+class AbortAxios {
+  addPending(config: AxiosRequestConfig) {
+    this.removePending(config)
+    const url = generateReqKey(config)
+    const abortController = new AbortController()
+    config.signal = abortController.signal
+    if (!pendingMap.has(url)) {
+      pendingMap.set(url, abortController)
+    }
+  }
+
+  removePending(config: AxiosRequestConfig) {
+    const url = generateReqKey(config);
+    if (pendingMap.has(url)) {
+      const abortController = pendingMap.get(url)
+      abortController?.abort()
+      pendingMap.delete(url)
+    }
+  }
+
+  removeAllPending() {
+    pendingMap.forEach((abortController) => {
+      abortController.abort()
+    })
+    this.clear()
+  }
+
+  clear() {
+    pendingMap.clear()
+  }
+}
+
+export default AbortAxios
+
+```
+retryAxios.ts
+```ts
+import type { AxiosError, AxiosInstance } from 'axios'
+
+export function retry(instance: AxiosInstance, err: AxiosError) {
+  const config: any = err.config
+  // 获取配置项内容(请求间隔时间，请求次数)
+  const { waitTime, count } = config.retryConfig ?? {}
+  // 当前重复请求的次数
+  config.currentCount = config.currentCount ?? 0
+  console.log(`第${config.currentCount}次重连`)
+
+  // 如果当前的重复请求次数已经大于规定次数，则返回Promise
+  if (config.currentCount >= count) {
+    return Promise.reject(err)
+  }
+  config.currentCount++
+
+  // 等待间隔时间结束后再执行请求
+  return wait(waitTime).then(() => instance(config))
+}
+
+function wait(waitTime: number) {
+  return new Promise((resolve) => setTimeout(resolve, waitTime))
+}
+
+```
+
 AxiosMax
 ```ts
 import type { AxiosOptions, RequstInterceptors, Respones } from './type'
@@ -201,6 +275,7 @@ import type {
 } from 'axios'
 import axios from 'axios'
 import { PendingAxios } from './PendingAxios'
+import AbortAxios from './AbortAxios'
 
 class AxiosMax {
     // axios实例, 通过axios.create()方法创建
@@ -222,61 +297,82 @@ class AxiosMax {
      * 注册拦截器
      */
     setInterceptors() {
-        const {
-            requestInterceptors,
-            requestInterceptorsCatch,
-            responseInterceptor,
-            responseInterceptorsCatch,
-        } = this.interceptors || {}
+      const {
+        requestInterceptors,
+        requestInterceptorsCatch,
+        responseInterceptor,
+        responseInterceptorsCatch,
+      } = this.interceptors || {};
 
-        // 创建挂起请求实例
-        const pendingAxios = new PendingAxios()
+      // 创建挂起请求实例
+      const pendingAxios = new PendingAxios();
 
-        // 挂载请求拦截器
-        this.axiosInstance.interceptors.request.use(async (config: InternalAxiosRequestConfig) => {
-            // 是否挂起后续重复请求
-            const pendingRepetitiveRequest = (config as any)?.pendingRepetitiveRequest ?? this.options.pendingRepetitiveRequest
-            if (pendingRepetitiveRequest) {
-                await pendingAxios.pengingRequest(config)
-            }
+      // 创建取消请求实例
+      const abortAxios = new AbortAxios();
 
-            if (requestInterceptors) {
-                // 如果存在请求拦截器，则将 config 先交给 requestInterceptors 做对应的配置。
-                config = requestInterceptors(config)
-            }
-            return config
-        }, requestInterceptorsCatch ?? undefined)
+      // 挂载请求拦截器
+      this.axiosInstance.interceptors.request.use(
+        async (config: InternalAxiosRequestConfig) => {
+          // 是否挂起后续重复请求
+          const pendingRepetitiveRequest =
+            (config as any)?.pendingRepetitiveRequest ??
+            this.options.pendingRepetitiveRequest;
+          // 是否取消重复请求
+          const abortRepetitiveRequest =
+            (config as unknown as any)?.abortRepetitiveRequest ??
+                  this.options.abortRepetitiveRequest;
+              
+              if (pendingRepetitiveRequest) {
+                  await pendingAxios.pengingRequest(config);
+              } else if (abortRepetitiveRequest) {
+                // 存储请求标识
+                abortAxios.addPending(config);
+              }
 
-        // 挂载响应拦截器
-        this.axiosInstance.interceptors.response.use(
-            (res: AxiosResponse) => {
-                // 取消请求
-                res && pendingAxios.successHandle(res)
-                if (responseInterceptor) {
-                    // 如果存在响应拦截器，则将返回值先交给 responseInterceptor 做处理
-                    res = responseInterceptor(res)
-                }
-                // 根据 options.directlyGetData 配置选项判断是否直接取得data值
-                if (this.options.directlyGetData) {
-                    res = res.data
-                }
-                return res
-            },
-            (err: AxiosError | any) => {
-                if (err.type && err.type === 'limiteResSuccess') {
-                    return Promise.resolve(this.options.directlyGetData ? err.val.data : err.val)
-                } else if (err.type && err.type === 'limiteResError') {
-                    return Promise.reject(err.val);
-                } else {
-                    pendingAxios.errorHandle(err)
-                }
-                if (responseInterceptorsCatch) {
-                    // 如果存在响应错误拦截器，则将返回值交给 responseInterceptorsCatch 做处理
-                    return responseInterceptorsCatch(this.axiosInstance, err)
-                }
-                return err
-            },
-        )
+          if (requestInterceptors) {
+            // 如果存在请求拦截器，则将 config 先交给 requestInterceptors 做对应的配置。
+            config = requestInterceptors(config);
+          }
+          return config;
+        },
+        requestInterceptorsCatch ?? undefined
+      );
+
+      // 挂载响应拦截器
+      this.axiosInstance.interceptors.response.use(
+        (res: AxiosResponse) => {
+          // 取消请求
+          res && pendingAxios.successHandle(res);
+
+          // 取消请求
+          res && abortAxios.removePending(res.config);
+          if (responseInterceptor) {
+            // 如果存在响应拦截器，则将返回值先交给 responseInterceptor 做处理
+            res = responseInterceptor(res);
+          }
+          // 根据 options.directlyGetData 配置选项判断是否直接取得data值
+          if (this.options.directlyGetData) {
+            res = res.data;
+          }
+          return res;
+        },
+        (err: AxiosError | any) => {
+          if (err.type && err.type === "limiteResSuccess") {
+            return Promise.resolve(
+              this.options.directlyGetData ? err.val.data : err.val
+            );
+          } else if (err.type && err.type === "limiteResError") {
+            return Promise.reject(err.val);
+          } else {
+            pendingAxios.errorHandle(err);
+          }
+          if (responseInterceptorsCatch) {
+            // 如果存在响应错误拦截器，则将返回值交给 responseInterceptorsCatch 做处理
+            return responseInterceptorsCatch(this.axiosInstance, err);
+          }
+          return err;
+        }
+      );
     }
 
     /**
@@ -319,12 +415,32 @@ index.ts
 ```ts
 import AxiosMax from "./AxiosMax"
 
+const _RequstInterceptors: RequstInterceptors = {
+  requestInterceptors(config: InternalAxiosRequestConfig) {
+    return config;
+  },
+  requestInterceptorsCatch(err) {
+    return err;
+  },
+  responseInterceptor(config) {
+    return config;
+  },
+  responseInterceptorsCatch(axiosInstance, err: AxiosError) {
+    //const message = err.code === "ECONNABORTED" ? "请求超时" : undefined;
+    if (isCancel(err)) {
+      return Promise.reject(err);
+    }
+    // 因为网络问题才进行尝试
+    return retry(axiosInstance, err as AxiosError);
+  },
+};
+
 const useRequest = new AxiosMax({
     directlyGetData: true,
     baseURL: import.meta.env.VITE_BASE_API,
     timeout: 15000,
     withCredentials:false,
-    //interceptors: _RequstInterceptors,
+    interceptors: _RequstInterceptors,
     //abortRepetitiveRequest: true,
     pendingRepetitiveRequest: true,
     retryConfig: {
