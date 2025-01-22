@@ -48,10 +48,25 @@ class MyPromise {
     return this.then(callBack, callBack)
   }
 
-  static try (fn) { 
+  // static try (fn) { 
+  //   return new MyPromise((resolve, reject) => {
+  //     try {
+  //       resolve(fn());
+  //     } catch (error) {
+  //       reject(error);
+  //     }
+  //   });
+  // }
+
+  static try (fn) {
     return new MyPromise((resolve, reject) => {
       try {
-        resolve(fn());
+        const result = fn()
+        if (isPromiseLike(result)) {
+          result.then(resolve, reject)
+        } else {
+          resolve(result)
+        }
       } catch (error) {
         reject(error);
       }
@@ -209,10 +224,14 @@ function mayBeSyncOrAsync () {
   if (Math.random() > 0.5) {
     return 'Sync value';
   } else {
-    return Promise.resolve('Async value');
+    return MyPromise.resolve('Async value');
   }
 }
 
 MyPromise.try(() => mayBeSyncOrAsync())
-  .then(result => console.log('Result:', result))
+  .then(result => { 
+    console.log('Result:', result)
+    return result
+  })
+  //.then(result => console.log('Result2:', result))
   .catch(error => console.error('Error:', error));
