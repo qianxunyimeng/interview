@@ -448,13 +448,36 @@ isPromiseLike = (value) => {
 
 
 
-MyPromise.deferred = function () {
-  let result = {};
-  result.promise = new MyPromise((resolve, reject) => {
-    result.resolve = resolve;
-    result.reject = reject;
-  });
-  return result;
-}
+// MyPromise.deferred = function () {
+//   let result = {};
+//   result.promise = new MyPromise((resolve, reject) => {
+//     result.resolve = resolve;
+//     result.reject = reject;
+//   });
+//   return result;
+// }
 
 module.exports = MyPromise;
+
+const f = () => {
+  console.log('Function f is executing');
+  return 21; // 假设这是一个同步函数，返回一个值  
+};
+
+// MyPromise.try(f).then(value => {
+//   console.log('Received value:', value); // 输出: Received value: 21  
+// });
+
+const asyncF = () => {
+  return new MyPromise((resolve) => {
+    setTimeout(() => {
+      resolve('Async value');
+    }, 3000);
+  });
+};
+
+MyPromise.try(() => asyncF()).then(value => {
+  console.log('Received async value:', value); // 一秒后输出: Received async value: Async value  
+});
+
+console.log('This will execute before the Promise.try callback');

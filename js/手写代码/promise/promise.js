@@ -2,6 +2,8 @@
 const PENDING = 'PENDING';
 const FULFILLED = 'FULFILLED';
 const REJECTED = 'REJECTED';
+//import {isPromiseLike } from "./util"
+const { isPromiseLike} = require("./util")
 
 // 手写Promise
 class MyPromise {
@@ -37,6 +39,43 @@ class MyPromise {
       this.#run()
     })
     return promise2
+  }
+
+  catch (onRejected) {
+    return this.then(undefined, onRejected);
+  }
+  finally (callBack) {
+    return this.then(callBack, callBack)
+  }
+
+  static try (fn) { 
+    return new MyPromise((resolve, reject) => {
+      try {
+        resolve(fn());
+      } catch (error) {
+        reject(error);
+      }
+    });
+  }
+
+  static resolve (value) {
+    if (value instanceof MyPromise) {
+      console.log("value is Mypromise")
+      // 如果参数是 Promise 实例，那么Promise.resolve将不做任何修改、原封不动地返回这个实例。
+      return value
+    } else if (isPromiseLike(value)) {
+      // 参数是一个thenable对象,thenable对象指的是具有then方法的对象
+      // Promise.resolve()方法会将这个对象转为 Promise 对象，然后就立即执行thenable对象的then()方法。
+      return new MyPromise((resolve, reject) => {
+        value.then(resolve, reject);
+      })
+    } else {
+      // 参数不是具有then()方法的对象，或根本就不是对象
+      // 如果参数是一个原始值，或者是一个不具有then()方法的对象，则Promise.resolve()方法返回一个新的 Promise 对象，状态为resolved
+      return new MyPromise((resolve) => {
+        resolve(value)
+      })
+    }
   }
 
   // promise状态改变
@@ -164,4 +203,16 @@ async function mian () {
   }
 }
 
-mian()
+//mian()
+
+function mayBeSyncOrAsync () {
+  if (Math.random() > 0.5) {
+    return 'Sync value';
+  } else {
+    return Promise.resolve('Async value');
+  }
+}
+
+MyPromise.try(() => mayBeSyncOrAsync())
+  .then(result => console.log('Result:', result))
+  .catch(error => console.error('Error:', error));
