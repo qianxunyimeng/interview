@@ -319,6 +319,7 @@ b. 子窗口：<http://child.domain.com/b.html>
 ```
 
 ## 10.说说你对IIFE的理解
+[IIFE](https://juejin.cn/post/7405153978165018661)
 
 IIFE，全称为：Immediately Invoked Function Expression，即：立即调用函数表达式。
 
