@@ -731,7 +731,13 @@ Reflect.defineProperty(this, 'a', {
 
 ## 20. js继承实现方式及优缺点
 
+[掘金](https://juejin.cn/post/6844903696111763470?searchId=20250207214428380C424D8C321A2D6D01)
+
 1. 原型链继承
+
+构造函数、原型和实例之间的关系：每个构造函数都有一个原型对象，原型对象都包含一个指向构造函数的指针，而实例都包含一个原型对象的指针。
+
+继承的本质就是复制，即重写原型对象，代之以一个新类型的实例。
 
 ```js
 function SuperType() {
@@ -756,6 +762,7 @@ SubType.prototype.getSubValue = function() {
 var instance = new SubType();
 console.log(instance.getSuperValue()); // true
 ```
+![原型链继承](../images/原型链继承-1.png)
 
 原型链方案存在的缺点：多个实例对引用类型的操作会被篡改
 
@@ -974,6 +981,7 @@ instance1.colors.push("2"); // ["red", "blue", "green", "2"]
 instance1.colors.push("3"); // ["red", "blue", "green", "3"]
 
 ```
+![寄生组合式继承](../images/寄生组合式继承.png)
 
 这个例子的高效率体现在它只调用了一次SuperType 构造函数，并且因此避免了在SubType.prototype 上创建不必要的、多余的属性。于此同时，原型链还能保持不变；因此，还能够正常使用instanceof 和isPrototypeOf()。
 这是最成熟的方法，也是现在库实现的方法
