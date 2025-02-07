@@ -330,9 +330,9 @@ IIFE，全称为：Immediately Invoked Function Expression，即：立即调用�
 
 优点
 
-- 避免作用域命名污染
+- 形成单独的命名空间，避免作用域命名冲突
 - 提升性能（减少了对作用域的查找）
-- 避免全局命名冲突
+- 创建局部作用域，避免全局变量污染
 - 保存闭包状态
 - 有利于代码压缩（可以用简单字符串代替）
 - 颠倒代码执行顺序
@@ -672,7 +672,6 @@ console.log(Function.prototype.__proto__ === Object.prototype); // true
 const a = {
   value: 1,
   valueOf: function () { 
-    console.log('valueOf');
     return this.value++
   }
 }
@@ -712,8 +711,17 @@ Reflect.defineProperty(this, 'a', {
         return _a++;
     }
 });
-console.log(a == 1 && a == 2 && a == 3) //true
+//console.log(a == 1 && a == 2 && a == 3) //true
 console.log(a === 1 && a === 2 && a === 3) //true
+```
+
+这里也可以采用方法2的写法
+```javascript
+Reflect.defineProperty(this, 'a', {
+  get () {
+    return this.value = this.value ? (this.value += 1) : 1;
+  }
+});
 ```
 
 综上所述
