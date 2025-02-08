@@ -1116,7 +1116,7 @@ for (var i = 0; i < 10; i++) {
 for (let i = 0; i< 10; i++){
   setTimeout(() => {
     console.log(i);
-    }, 1000)
+    }, 1000) // 如果想每间隔一秒输出一个，可以写成 1000 * i
 }
 ```
 
@@ -1128,7 +1128,7 @@ for (var i = 0; i < 10; i++) {
     (i => {
         setTimeout(() => {
             console.log(i);
-        }, 1000)
+        }, 1000)// 如果想每间隔一秒输出一个，可以写成 1000 * i
     })(i)
 }
 ```
@@ -1149,10 +1149,10 @@ for (var i = 0; i < 10; i++) {
 方法四：setTimeout函数传参，一秒以后一次性熟吃0到9
 
 ```js
-for (let i = 0; i < 10; i++) {
+for (var i = 0; i < 10; i++) {
   setTimeout((i) => {
     console.log(i);
-  }, 1000,i)
+  }, 1000,i) // 如果想每间隔一秒输出一个，setTimeout((i) => {console.log(i)},1000 * i,i)
 }
 
 ```
@@ -1164,7 +1164,7 @@ for (var i = 0; i < 10; i++) {
   const _i = i
   setTimeout(() => {
     console.log(_i);
-  }, 1000)
+  }, 1000)// 如果想每间隔一秒输出一个，可以写成 1000 * i
 }
 ```
 
@@ -1177,7 +1177,7 @@ for (var i = 0; i < 10; i++) {
     } catch(i) {
         setTimeout(() => {
             console.log(i);
-        }, 1000)
+        }, 1000) // 如果想每间隔一秒输出一个，可以写成 1000 * i
     }
 }
 ```
@@ -1600,6 +1600,8 @@ new和字面量创建对象的区别：
 
 ## 30. V8 下的垃圾回收机制是怎么样的？
 
+[掘金](https://juejin.cn/post/6876638765025067015?searchId=2025020814224995FD66DA2B81626F709D)
+
 ##### 回收策略
 
 v8垃圾回收策略主要采用分代式回收机制，根具对象存活时间进行分代，将内存分为新生代和老生代两块内存空间。
@@ -1626,6 +1628,10 @@ Cheney算法是一种采用<font color="red">复制的方式实现垃圾回收</
 Scavenge由于只复制存活的对象，并且对于生命周期短的场景存活对象只占少部分，所以它在时间效率上有优异的表现。
 
 缺点：由于只能使用堆内存的一半，所以不适用大规模的垃圾回收机制中，是典型的牺牲空间换时间的算法。
+
+##### 可达性
+
+有一个概念叫对象的可达性，表示从初始的根对象（window，global）的指针开始，这个根指针对象被称为根集（root set），从这个根集向下搜索其子节点，被搜索到的子节点说明该节点的引用对象可达，并为其留下标记，然后递归这个搜索的过程，直到所有子节点都被遍历结束，那么没有被标记的对象节点，说明该对象没有被任何地方引用，可以证明这是一个需要被释放内存的对象，可以被垃圾回收器回收。
 
 ##### Mark-sweep(标记清除) 和 Mark-compact（标记压缩） 算法（用于老生代垃圾回收机制）
 
@@ -1671,9 +1677,9 @@ null: 已声明已赋值，值是null
 // 防抖函数，立即执行版
 const debounce = (fn, delayTime) => {
   let timerId
-  return function () {
+  return function (...args) {
     let th = this
-    let args = arguments
+    //let args = arguments
     // 说明第一次直接执行回调，反之不是，重新计时
     timerId == null ? fn.apply(th, args) : clearTimeout(timerId)
     timerId = setTimeout(() => fn.apply(th, args), delayTime)
