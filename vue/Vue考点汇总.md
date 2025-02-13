@@ -1392,3 +1392,227 @@ Vue和React的框架在设计时，是希望代码可移植到其他环境，如
 5. 组件粒度的更新：在Vue和React中，数据变化时，操作的不是单个真实DOM，而是组件。组件的更新是由render函数来渲染的，如果组件中包含很多真实DOM，数据变化会导致render函数重新运行，这可能导致不必要的DOM生成，影响效率。虚拟DOM通过对比，精准定位到真实DOM哪里需要更新，避免了这种低效的操作。
 
 6. 避免回流和重绘：虚拟DOM不会进行回流和重绘；真实DOM在频繁操作时引发的回流重绘导致性能降低。虚拟DOM有效降低大面积的重绘与排版，因为是和真实DOM对比，更新差异部分，所以只渲染局部。
+
+
+
+
+
+## Element Plus Form组件设计原理
+
+表单组件构成元素都是由 Form 组件、Form-item 组件、表单元素组件（如 Input 组件） 组合而成。
+Form-item 组件 就是一组验证策略，通常是一个字段的验证策略，一个表单通常需要收集很多数据，那么就需要很多 Form-item 组件，每个 Form-item 组件 相当于一个容器，里面通常装着一个 表单元素组件（如 Input 组件），这样就实现了字段与字段组件策略之间的解耦，还有排版布局的解耦，因为一个 Form-item 组件 就是一组相同的 CSS 样式。每个 表单元素组件 又进行了独立封装，这样每个 表单元素组件 与 Form-item 组件 又进行了解耦，且是零耦合，因为 表单元素组件 可以不依赖 Form-item 组件 和 Form 组件 进行使用。 Form 组件 则相当于一个大容器，装载着所需要收集的数据字段的表单组件，也可以看成是一个大管家，管理着整一个表单的状态与数据的验证，合规了才能进行提交。
+
+从数据验证的角度进行设计就是每个 Form-item 组件 能够独立验证自己的字段数据，也就是鼠标触发 blur 或者 change 事件的时候进行验证，最后点击提交的时候再由大管家 Form 组件 进行验证所有的字段数据，本质是将所有的 Form-item 组件 进行校验。
+
+### Form 表单校验实现
+
+我们通过前文可以知道 Form 组件 校验的时候是校验所有的 Form-item 组件，其实是初始化的时候将所有的设置有 prop 属性的 Form-item 组件 收集起来。
+
+那么怎么收集起来呢？就是 Form 组件 提供一个 addField 的方法通过 provide API 提供给后代组件，然后在 Form-item 组件 里通过 inject 获取到这个 addField 方法，然后把 Form-item 组件 中创建的上下文 context 对象通过 addFiled 方法传递给 Form 组件，这样 Form 组件 中就有每个 Form-item 组件 的上下文 context 对象了，再通过 Form-item 组件 的上下文 context 对象就可以调用 Form-item 组件 中的 validate 校验函数了，这样就可以在 Form 组件 中对 Form-item 组件 进行校验了。
+
+form.vue
+Form组件通过provide把formContext传递给子孙组件，这里面就包括rules
+```js
+const fields: FormItemContext[] = []
+const addField: FormContext['addField'] = (field) => {
+  fields.push(field)
+}
+
+const doValidateField = async (
+  props: Arrayable<FormItemProp> = []
+): Promise<boolean> => {
+  if (!isValidatable.value) return false
+
+  const fields = obtainValidateFields(props)
+  if (fields.length === 0) return true
+
+  let validationErrors: ValidateFieldsError = {}
+  // 调用所有子组件的校验方法
+  for (const field of fields) {
+    try {
+      // 触发方式为空，表示校验所有规则
+      await field.validate('')
+    } catch (fields) {
+      validationErrors = {
+        ...validationErrors,
+        ...(fields as ValidateFieldsError),
+      }
+    }
+  }
+  // 错误信息为空校验通过
+  if (Object.keys(validationErrors).length === 0) return true
+  return Promise.reject(validationErrors)
+}
+
+
+provide(
+  formContextKey,
+  reactive({
+    ...toRefs(props),
+    emit,
+
+    resetFields,
+    clearValidate,
+    validateField,
+    getField,
+    addField,
+    removeField,
+    ...useFormLabelWidth(),
+  })
+)
+
+defineExpose({
+  validate, // 对外暴露 validate 方法，在我们的组件里通过ref拿到ElForm组件实例调用validate方法
+  validateField,
+  resetFields,
+  clearValidate,
+  scrollToField,
+  fields,
+})
+
+```
+
+Form-Item.vue 重要的代码片段
+```ts
+
+const normalizedRules = computed(() => {
+  const { required } = props
+
+  const rules: FormItemRule[] = []
+
+  // Form-Item组件传递的rules
+  if (props.rules) {
+    rules.push(...ensureArray(props.rules))
+  }
+
+  const formRules = formContext?.rules
+  if (formRules && props.prop) {
+    // 从Form组件身上拿到对应表单项的rules
+    const _rules = getProp<Arrayable<FormItemRule> | undefined>(
+      formRules,
+      props.prop
+    ).value
+    if (_rules) {
+      // 将Form-Item以及Form组件的rules合并
+      rules.push(...ensureArray(_rules))
+    }
+  }
+
+  // Form-Item 配置了required属性
+  if (required !== undefined) {
+    const requiredRules = rules
+      .map((rule, i) => [rule, i] as const)
+      .filter(([rule]) => Object.keys(rule).includes('required'))
+
+    if (requiredRules.length > 0) {
+      for (const [rule, i] of requiredRules) {
+        if (rule.required === required) continue
+        // 修改rules里的required，以Form-Item配置的required为准
+        rules[i] = { ...rule, required }
+      }
+    } else {
+      // rules并没有配置required,将required添加到rules里
+      rules.push({ required })
+    }
+  }
+
+  return rules
+})
+
+// 通过校验触发方式 blur、change拿到对应的rules
+const getFilteredRule = (trigger: string) => {
+  const rules = normalizedRules.value
+  return (
+    rules
+      .filter((rule) => {
+        if (!rule.trigger || !trigger) return true
+        if (Array.isArray(rule.trigger)) {
+          return rule.trigger.includes(trigger)
+        } else {
+          return rule.trigger === trigger
+        }
+      })
+      .map(({ trigger, ...rule }): RuleItem => rule)
+  )
+}
+
+// 执行校验
+const doValidate = async (rules: RuleItem[]): Promise<true> => {
+  // 拿到prop，给哪一个字段做校验
+  const modelName = propString.value
+  const validator = new AsyncValidator({
+    [modelName]: rules,
+  })
+  return validator
+    .validate({ [modelName]: fieldValue.value }, { firstFields: true }) // 如果一个字段设置了多个规则，firstFields:true，表示遇到第一个规则校验失败就不再进行校验了
+    .then(() => {
+      onValidationSucceeded()
+      return true as const
+    })
+    .catch((err: FormValidateFailure) => {
+      onValidationFailed(err as FormValidateFailure)
+      return Promise.reject(err)
+    })
+}
+
+// Form-Item validate逻辑
+const validate: FormItemContext['validate'] = async (trigger, callback) => {
+  // skip validation if its resetting
+  if (isResettingField || !props.prop) {
+    return false
+  }
+
+  const hasCallback = isFunction(callback)
+  if (!validateEnabled.value) {
+    callback?.(false)
+    return false
+  }
+
+  const rules = getFilteredRule(trigger)
+  if (rules.length === 0) {
+    callback?.(true)
+    return true
+  }
+
+  setValidationState('validating')
+
+  return doValidate(rules)
+    .then(() => {
+      callback?.(true)
+      return true as const
+    })
+    .catch((err: FormValidateFailure) => {
+      const { fields } = err
+      callback?.(false, fields)
+      return hasCallback ? false : Promise.reject(fields)
+    })
+}
+
+
+const context: FormItemContext = reactive({
+  ...toRefs(props),
+  $el: formItemRef,
+  size: _size,
+  validateState,
+  labelId,
+  inputIds,
+  isGroup,
+  hasLabel,
+  fieldValue,
+  addInputId,
+  removeInputId,
+  resetField,
+  clearValidate,
+  validate, // 校验函数
+})
+
+// form-item 通过provide 把校验规则等数据传递给子孙组件
+provide(formItemContextKey, context)
+
+onMounted(() => {
+  if (props.prop) { // 组件初始化完毕后，如果配置了prop。
+    formContext?.addField(context) //将context传递给Form组件
+    initialValue = clone(fieldValue.value)
+  }
+})
+```
