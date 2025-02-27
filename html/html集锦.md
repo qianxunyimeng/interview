@@ -30,6 +30,7 @@ html中的替换元素有：<img>, <input>, <textarea>, <select>, <object>
 
 另外 z-index 属性也可以改变显示优先级，但只对同种类型的元素才有效。
 
+
 ## 3. input元素中readonly和disabled属性的理解
 
 相同点：都会使文本框变成只读，不可编辑。
