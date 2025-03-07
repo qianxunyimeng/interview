@@ -1,4 +1,4 @@
-# CSS面试题集合
+# CSS集合
 
 ## 1. CSS sprites的原理和优缺点
 
