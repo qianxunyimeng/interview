@@ -230,6 +230,72 @@ self.close() //方法一
 </script>
 ```
 
+将一个函数变成webworker
+```js
+// 文件名为main.js
+function work () {
+  onmessage = ({data: {message}}) => {
+    console.log ('i am worker, receive:' + message);
+    postMessage ({result: 'message from worker'});
+  };
+}
+
+const runWorker = f => {
+  const worker = new Worker (
+    URL.createObjectURL (new Blob ([`(${f.toString ()})()`]))
+  );
+
+  worker.onmessage = ({data: {result}}) => {
+    console.log ('i am main thread, receive:' + result);
+  };
+
+  worker.postMessage ({message: 'message from main thread'});
+};
+
+const testWorker = runWorker (work);
+```
+
+用Promise和闭包的方式去改造
+我们再让它更通用一些，用Promise和闭包的方式去改造它，把runworker函数改造成一个makeworker函数
+
+```js
+// 文件名为index.js
+function work () {
+  onmessage = ({data: {jobId, message}}) => {
+    console.log ('i am worker, receive:-----' + message);
+    postMessage ({jobId, result: 'message from worker'});
+  };
+}
+
+const makeWorker = f => {
+  let pendingJobs = {};
+
+  const worker = new Worker (
+    URL.createObjectURL (new Blob ([`(${f.toString ()})()`]))
+  );
+
+  worker.onmessage = ({data: {result, jobId}}) => {
+    // 调用resolve，改变Promise状态
+    pendingJobs[jobId] (result);
+    // 删掉，防止key冲突
+    delete pendingJobs[jobId];
+  };
+
+  return (...message) =>
+    new Promise (resolve => {
+      const jobId = String (Math.random ());
+      pendingJobs[jobId] = resolve;
+      worker.postMessage ({jobId, message});
+    });
+};
+
+const testWorker = makeWorker (work);
+
+testWorker ('message from main thread').then (message => {
+  console.log ('i am main thread, i receive:-----' + message);
+});
+```
+
 ## HTML中，img 标签 srcset 属性的作用是什么?
 
 srcset 属性可为同一图像提供多个文件源和各自的分辨率描述符。浏览器会根据当前设备的屏幕尺寸（如宽度）和像素密度（如 DPI ）来选择最合适的图像源进行加载。这样，就能 获得与其设备相匹配的最佳图像体验，而不必加载比所需更大或更高分辨率的图像，从而节省带宽并加快页面加载速度。用法如下
