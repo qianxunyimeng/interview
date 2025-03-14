@@ -1693,6 +1693,8 @@ const throttle = (fn, delayTime) => {
     let th = this
     let args = arguments
     let _now = Date.now()
+    // _now - _start:此时此刻距离上一次执行fn过了多长时间, remainTime:距离即将要执行的一次的剩余时间  
+
     let remainTime = delayTime - (_now - _start)
     clearTimeout(timerId)
     if (remainTime <= 0) {
@@ -1772,3 +1774,44 @@ const throttle = (fn, delayTime) => {
   1. Object.keys() 只能遍历自身可枚举属性
   2. for...in循环遍历自身可枚举属性以及原型上的可枚举属性
   3. Object.getOwnPropertyNames() 遍历自身所有属性，不论是否可枚举
+
+
+
+## window.parent、window.self、window.top
+
+1. 说明
+在应用有frameset或者iframe的页面时，parent是父窗口，top是最顶级父窗口（有的窗口中套了好几层frameset或者iframe），self是当前窗口。
+
+2. window.self
+
+功能：是对当前窗口自身的引用。它和window属性是等价的。
+
+语法：window.self
+
+注意：window、self、window.self是等价的。
+
+3、window.top
+
+功能：返回顶层窗口，即浏览器窗口。
+
+语法：window.top
+
+注意：如果窗口本身就是顶层窗口，top属性返回的是对自身的引用。
+
+4、window.parent
+
+功能：返回父窗口。
+
+语法：window.parent
+
+注意：如果窗口本身是顶层窗口，parent属性返回的是对自身的引用。
+
+在框架网页中，一般父窗口就是顶层窗口，但如果框架中还有框架，父窗口和顶层窗口就不一定相同了。
+
+5.判断：
+
+我们可以使用这三个对象判断是否应用有iframe嵌套或者是否有多层iframe嵌套或实现其它功能，举例如下：
+
+（1）window.top === window.self  为true表示当前窗口就是顶层窗口，没有iframe应用；为false表示当前窗口不是顶层窗口，存在iframe应用。
+（2）window.top === window.parent （window.top!==window.self）为true表示父窗口就是顶层窗口，只有一层iframe嵌套；为false表示父窗口不是顶层窗口，存在多层iframe嵌套。
+（3）使用不同对象的location. href实现嵌套中指定窗口的跳转；使用不同对象的location. reload()实现嵌套中指定窗口的刷新。
