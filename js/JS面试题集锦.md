@@ -1815,3 +1815,24 @@ const throttle = (fn, delayTime) => {
 （1）window.top === window.self  为true表示当前窗口就是顶层窗口，没有iframe应用；为false表示当前窗口不是顶层窗口，存在iframe应用。
 （2）window.top === window.parent （window.top!==window.self）为true表示父窗口就是顶层窗口，只有一层iframe嵌套；为false表示父窗口不是顶层窗口，存在多层iframe嵌套。
 （3）使用不同对象的location. href实现嵌套中指定窗口的跳转；使用不同对象的location. reload()实现嵌套中指定窗口的刷新。
+
+
+## 单例模式
+```js
+// 单例模式包装器 传入一个构造函数，返回该构造器对应的单例函数
+function singletonWrap (className) { 
+  let ins = null
+  const proxy = new Proxy(className, {
+    construct (target, args) {
+      if (ins) {
+        return ins
+      }
+      ins = Reflect.construct(target, args)
+      return ins
+    }
+  })
+  // 防止使用者通过 实例.construct() 创建多实例
+  proxy.prototype.construct = proxy
+  return proxy
+}
+```

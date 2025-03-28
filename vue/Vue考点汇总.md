@@ -111,6 +111,93 @@ Vue3
 
 不在data里，属性就不是响应式的，可以用Vue.set(target,key,val)或 this.$set(target,key,val) 将属性转换成响应式的
 
+### vue.set的实现原理
+ 1. 首先，Vue.set方法会检查目标对象是否是响应式的。如果不是，直接设置属性值并返回
+ ```js
+  if (!Vue.isReactive(target)) {
+    target[propertyName] = value;
+    return value;
+  }
+ ```
+ 2. 处理数组
+ 如果目标对象是数组，Vue.set方法会调用数组的splice方法来添加新元素。splice方法是Vue重写过的，能够触发响应式更新
+ ```js
+  if (Array.isArray(target) && isValidArrayIndex(propertyName)) {
+    target.splice(propertyName, 1, value);
+    return value;
+  }
+ ```
+ 3. 处理对象
+ 如果目标对象是普通对象，Vue.set方法会调用Object.defineProperty方法来定义新属性，并确保新属性是响应式
+ ```js
+  if (target.hasOwnProperty(propertyName)) {
+    target[propertyName] = value;
+    return value;
+  }
+  
+  const ob = target.__ob__;
+  if (!ob) {
+    target[propertyName] = value;
+    return value;
+  }
+  
+  defineReactive(ob.value, propertyName, value);
+  ob.dep.notify();
+  return value;
+ ```
+ 4. defineReactive 方法
+ defineReactive方法是Vue中用于定义响应式属性的核心方法。它会使用Object.defineProperty来拦截属性的访问和修改
+ ```js
+  function defineReactive(obj, key, val) {
+    const dep = new Dep();
+    Object.defineProperty(obj, key, {
+      enumerable: true,
+      configurable: true,
+      get: function reactiveGetter() {
+        if (Dep.target) {
+          dep.depend();
+        }
+        return val;
+      },
+      set: function reactiveSetter(newVal) {
+        if (newVal === val) return;
+        val = newVal;
+        dep.notify();
+      }
+    });
+  }
+ ```
+ 5. Dep类
+ Dep类是Vue中用于管理依赖的类。每个响应式属性都有一个对应的Dep实例，用于收集和触发依赖
+ ```js
+  class Dep {
+    constructor() {
+      this.subs = [];
+    }
+  
+    addSub(sub) {
+      this.subs.push(sub);
+    }
+  
+    removeSub(sub) {
+      remove(this.subs, sub);
+    }
+  
+    depend() {
+      if (Dep.target) {
+        Dep.target.addDep(this);
+      }
+    }
+  
+    notify() {
+      const subs = this.subs.slice();
+      for (let i = 0, l = subs.length; i < l; i++) {
+        subs[i].update();
+      }
+    }
+  }
+ ```
+
 ## 9. Vue2是如何监测数组数据的变化
 
 Vue2.x 中实现检测数组变化的方法，是将数组的常用方法(push,pop,shift,unshift,splice,sort,reverse)进行了重写。Vue 将 data 中的数组进行了原型链重写，指向了自己定义的数组原型方法。这样当调用数组 api 时，可以通知依赖更新。如果数组中包含着引用类型，会对数组中的引用类型再次递归遍历进行监控。这样就实现了监测数组变化。
@@ -325,6 +412,7 @@ Vue3 中没有了 EventBus 跨组件通信，但是现在有了一个替代的�
 
 ## 13. 自定义指令的生命周期（钩子函数）有哪些
 
+vue2指令生命周期
 - bind：只调用一次，指令第一次绑定到元素时调用。在这里可以进行一次性的初始化设置。
 
 - inserted：被绑定元素插入父节点时调用 (仅保证父节点存在，但不一定已被插入文档中)。
@@ -334,6 +422,32 @@ Vue3 中没有了 EventBus 跨组件通信，但是现在有了一个替代的�
 - componentUpdated：指令所在组件的 VNode 及其子 VNode 全部更新后调用。
 
 - unbind：只调用一次，指令与元素解绑时调用。
+
+
+vue3 指令生命周期
+```js
+const myDirective = {
+  // 在绑定元素的 attribute 前
+  // 或事件监听器应用前调用
+  created(el, binding, vnode) {
+    // 下面会介绍各个参数的细节
+  },
+  // 在元素被插入到 DOM 前调用
+  beforeMount(el, binding, vnode) {},
+  // 在绑定元素的父组件
+  // 及他自己的所有子节点都挂载完成后调用
+  mounted(el, binding, vnode) {},
+  // 绑定元素的父组件更新前调用
+  beforeUpdate(el, binding, vnode, prevVnode) {},
+  // 在绑定元素的父组件
+  // 及他自己的所有子节点都更新后调用
+  updated(el, binding, vnode, prevVnode) {},
+  // 绑定元素的父组件卸载前调用
+  beforeUnmount(el, binding, vnode) {},
+  // 绑定元素的父组件卸载后调用
+  unmounted(el, binding, vnode) {}
+}
+```
 
 ## 14. 说说你对keep-alive的理解是什么？
 
