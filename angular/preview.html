@@ -1,0 +1,13 @@
+<t-dialog [header]="fileName" [(visible)]="_visible" [maximizable]="true"
+  [style]="{minHeight:'500px', minWidth: '800px'}" [closeIcon]="'icon-colse'" (onShow)="showDialog()"
+  (onHide)="hideDialog()" class="preview-dialog">
+  <div id="cert-preview-container">
+
+  </div>
+  <div *ngIf="errorInfo">
+    {{errorInfo}}
+  </div>
+  <div class="preview-loading" *ngIf="loading">
+    <t-loading [loadingIcon]="'routineLoding'"></t-loading>
+  </div>
+</t-dialog>
