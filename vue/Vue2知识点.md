@@ -128,3 +128,56 @@ function set (target, key, val) {
 4. 最后返回value
 
 这就是vue重写数组方法的原因，利用数组这些方法触发使得每一项的value都是响应式的。
+
+## vue2 组件二次封装注意事项
+
+有时候公共UI组件满足不了一些特定的需求样式，并且有较多地方使用同一个UI组件，这时候就需要考虑二次封装现有UI组件
+组件二次封装关键的几点：
+- 使用 $attrs 接收 props
+- 使用 $listeners 接收事件
+- 使用 $slots 和 $scopedSlots 接收插槽
+- 使用model定义prop变量及其变化的事件（改变v-model的默认事件（input），同时避免表单校验时的交互bug）覆盖原有事件（避免暴露出来的值变成[Object InputEvent]）
+ 
+
+```vue
+<template>
+  <a-input v-bind="$attrs" v-on="new$listeners" :value="value">
+    <!-- 遍历子组件非作用域插槽，并对父组件暴露 -->
+    <template v-for="(index, name) in $slots" v-slot:[name]>
+      <slot :name="name" />
+    </template>
+    <!-- 遍历子组件作用域插槽，并对父组件暴露 -->
+    <template v-for="(index, name) in $scopedSlots" v-slot:[name]="data">
+      <slot :name="name" v-bind="data"></slot>
+    </template>
+  </a-input>
+</template>
+<script>
+export default {
+  inheritAttrs: false, // 是否将继承的attribute设置到真实DOM上，这里没必要
+  model: {
+    prop: 'value',
+    event: 'change' // 输入内容时，事件执行顺序为：chang =》 表单校验 =》 input， 所以这里不能写input，要写change
+  },
+  props: {
+    value: [String]
+  },
+  data() {
+    return {};
+  },
+  computed: {
+    new$listeners() {
+      return Object.assign(this.$listeners, {
+        //在这里覆盖原有的 change 事件
+        change: this.change
+      });
+    }
+  },
+  methods: {
+    change(e) {
+      this.$emit('change', e.target.value);
+    }
+  }
+};
+</script>
+```
