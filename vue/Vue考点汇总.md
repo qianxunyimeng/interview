@@ -1368,6 +1368,107 @@ vue 中的 scoped 属性的效果主要通过 PostCSS 转译实现的。PostCSS 
 </style>
 ```
 
+如果父组件使用scoped，子组件没有使用scoped。
+父组件style添加scoped后，所有元素都加上data-v属性，包括子组件的根节点，但是子组件的内层元素就不会受影响。如果子组件有插槽，父组件给子组件传入的slot内容也会添加data-v-xxx
+如果只修改子组件根节点的样式，还是可以写到父组件的scoped CSS里面，因为一个子组件的根节点会同时存在 两个data-v属性的，一个是父组件本来的，另一个是子组件根节点上面的；
+
+scoped本质上是给dom增加一个唯一属性，然后利用这个属性作为属性选择器设置样式达到模块化的目的（这里的属性值是vue-template-complier编译时动态添加的
+[参考](https://blog.csdn.net/u012193330/article/details/108791725)
+
+deep与深度选择器案例演示
+
+父组件
+```vue
+<template>
+	<div class="parent">
+		<h1>前端名狮</h1>
+		<child>
+		<div class="time">时间：2020年9月16日</div>
+		</child>
+	</div>
+</template>
+
+<script>
+import Child from "./Child.vue";
+export default {
+  components: {
+    Child,
+  },
+};
+</script>
+
+<style lang="less" scoped>
+.parent {
+	color: red;
+	h1 {
+		font-size: 30px;
+	}
+  // 在使用scoped的父组件中如何修改子组件样式
+	.child {
+	    font-size: 20px;
+	    .author {
+	        color: orange;
+	    }
+	}
+}
+</style>
+
+```
+
+![编译后](../images/deep-1.png)
+
+但是最终生成的样式是以父组件的属性值作为选择器的，这样父组件就只能修改子组件最外层的div样式，但是修改子组件内层元素的样式是不可行的。
+
+想要修改子组件的内层元素样式，就需要使用/deep/了，/deep/是less中深度选择器的>的另一种写法，只是因为>在vue模板中不能正常解析，所以用/deep/代替。修改下父组件：
+```
+<style lang="less" scoped>
+.parent {
+	color: red;
+	h1 {
+		font-size: 30px;
+	}
+/deep/	.child {
+	    font-size: 20px;
+	    .author {
+	        color: orange;
+	    }
+	}
+}
+</style>
+
+```
+![编译后](../images/deep-2.png)
+我们发现在使用深度选择器后，由 .parent .child .author[data-v-xxxx] 变成了 .parent[data-v-xxx] .child .author
+
+子组件
+```vue
+<template>
+    <div class="child">
+        <div class="author">作者：诀九</div>
+        <div class="introduce">介绍：定期推送前端技术相关文章，面试题详解</div>
+        <slot />
+    </div>
+</template>
+
+<script>
+export default {};
+</script>
+
+<style lang="less">
+.child {
+    font-size: 20px;
+    .author {
+        font-weight: 600;
+        color: red;
+    }
+    .introduce {
+        color: blue;
+    }
+}
+</style>
+
+```
+
 ## 45. keep-alive 相关
 
 - keep-alive的实现原理是什么
