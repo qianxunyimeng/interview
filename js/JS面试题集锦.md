@@ -1,8 +1,8 @@
 # JS考点汇总
 
 - [JS考点汇总](#js考点汇总)
-  - [1.typeof('abc')和typeof 'abc'都是string, 那么typeof是操作符还是函数](#1typeofabc和typeof-abc都是string-那么typeof是操作符还是函数)
-  - [2.你理解的"use strict";是什么?使用它有什么优缺点？](#2你理解的use-strict是什么使用它有什么优缺点)
+  - [1.typeof(&#39;abc&#39;)和typeof &#39;abc&#39;都是string, 那么typeof是操作符还是函数](#1typeofabc和typeof-abc都是string-那么typeof是操作符还是函数)
+  - [2.你理解的&#34;use strict&#34;;是什么?使用它有什么优缺点？](#2你理解的use-strict是什么使用它有什么优缺点)
   - [3.”attribute“和“property”有什么不同](#3attribute和property有什么不同)
   - [4.对new操作符符理解，手动实现一个new方法](#4对new操作符符理解手动实现一个new方法)
   - [5.手写call,apply,bind](#5手写callapplybind)
@@ -37,22 +37,22 @@
   - [22.JS原始类型有哪些](#22js原始类型有哪些)
   - [23.改造下面的代码，使之输出0 - 9](#23改造下面的代码使之输出0---9)
   - [24. var、let、const的区别](#24-varletconst的区别)
-        - [变量提升](#变量提升)
-          - [关于 let,var和function](#关于-letvar和function)
-        - [暂时性死区](#暂时性死区)
-        - [块级作用域](#块级作用域)
-        - [重复声明](#重复声明)
-        - [修改声明的变量](#修改声明的变量)
+    - [变量提升](#变量提升)
+    - [关于 let,var和function](#关于-letvar和function)
+    - [暂时性死区](#暂时性死区)
+    - [块级作用域](#块级作用域)
+    - [重复声明](#重复声明)
+    - [修改声明的变量](#修改声明的变量)
   - [25.setTimeout、setInterval 和 requestAnimationFrame 之间的区别](#25settimeoutsetinterval-和-requestanimationframe-之间的区别)
   - [26.手写Promise](#26手写promise)
   - [27. 手写call、apply、bind](#27-手写callapplybind)
   - [28. 手写new](#28-手写new)
   - [29. new的工作原理、new和字面量创建对象的区别？](#29-new的工作原理new和字面量创建对象的区别)
   - [30. V8 下的垃圾回收机制是怎么样的？](#30-v8-下的垃圾回收机制是怎么样的)
-        - [回收策略](#回收策略)
-      - [回收算法](#回收算法)
-        - [Scavenge算法（用于新生代垃圾回收机制）](#scavenge算法用于新生代垃圾回收机制)
-        - [Mark-sweep(标记清除) 和 Mark-compact（标记压缩） 算法（用于老生代垃圾回收机制）](#mark-sweep标记清除-和-mark-compact标记压缩-算法用于老生代垃圾回收机制)
+    - [回收策略](#回收策略)
+    - [回收算法](#回收算法)
+      - [Scavenge算法（用于新生代垃圾回收机制）](#scavenge算法用于新生代垃圾回收机制)
+      - [Mark-sweep(标记清除) 和 Mark-compact（标记压缩） 算法（用于老生代垃圾回收机制）](#mark-sweep标记清除-和-mark-compact标记压缩-算法用于老生代垃圾回收机制)
   - [31. null和undefined的区别](#31-null和undefined的区别)
   - [32. 防抖和节流](#32-防抖和节流)
   - [33. == 比较规则](#33--比较规则)
@@ -69,11 +69,8 @@ typeof 是操作符，不是函数。可以添加括号，但是括号的作用�
 设立"严格模式"的目的，主要有以下几个：
 
 - 消除Javascript语法的一些不合理、不严谨之处，减少一些怪异行为;
-
 - 消除代码运行的一些不安全之处，保证代码运行的安全；
-  
 - 提高编译器效率，增加运行速度；
-
 - 为未来新版本的Javascript做好铺垫
 
 ```html
@@ -96,7 +93,7 @@ new 操作符的几个作用
 new 操作符会返回一个对象，所以我们需要在内部创建一个对象
 这个对象，也就是构造函数中的 this，可以访问到挂载在 this 上的任意属性
 这个对象可以访问到构造函数原型上的属性，所以需要将对象与构造函数链接起来
-返回原始值需要忽略，返回对象需要正常处理
+返回原始值需要忽略，返回对象需要正常处理     
 
 着手实现功能
 
@@ -184,7 +181,7 @@ Function.prototype._bind = function(ctx, ...args) {
       // 调用 call 修改 this 指向
       return _self.call(ctx, ...args, ...rest)
     }
-    
+  
   }
   if (_self.prototype) {
     // 复制源函数的prototype给newFn 一些情况下函数没有prototype，比如箭头函数
@@ -269,7 +266,7 @@ console.log(Object.getOwnPropertyDescriptors(demo))
 
 ## 9.为什么会有跨域问题？怎么解决跨域？
 
-<https://juejin.cn/post/6844903882083024910>
+[https://juejin.cn/post/6844903882083024910](https://juejin.cn/post/6844903882083024910)
 跨域：指的是浏览器不能执行其他网站的脚本。它是由浏览器的同源策略造成的，是浏览器对javascript施加的安全限制。
 同源策略：是指协议，域名，端口都要相同，其中有一个不同都会产生跨域；
 
@@ -296,7 +293,7 @@ document.domain + iframe跨域
 此方案仅限主域相同，子域不同的跨域应用场景。
 实现原理：两个页面都通过js强制设置document.domain为基础主域，就实现了同域。
 
-a. 父窗口：(<http://www.domain.com/a.html>)
+a. 父窗口：([http://www.domain.com/a.html](http://www.domain.com/a.html))
 
 ```js
 <iframe id="iframe" src="http://child.domain.com/b.html"></iframe>
@@ -306,7 +303,7 @@ a. 父窗口：(<http://www.domain.com/a.html>)
 </script>
 ```
 
-b. 子窗口：<http://child.domain.com/b.html>
+b. 子窗口：[http://child.domain.com/b.html](http://child.domain.com/b.html)
 
 ```js
 <script>
@@ -319,6 +316,7 @@ b. 子窗口：<http://child.domain.com/b.html>
 ```
 
 ## 10.说说你对IIFE的理解
+
 [IIFE](https://juejin.cn/post/7405153978165018661)
 
 IIFE，全称为：Immediately Invoked Function Expression，即：立即调用函数表达式。
@@ -450,6 +448,77 @@ me.printIntroduction();
 
 传入一个原型对象，创建一个新对象，使用现有的对象来提供新创建的对象的__proto__，实现继承。
 
+## 12.2 创建对象 Object.create()、 new Object()、 {} 这三种方式的区别
+
+```js
+const objA = {}
+objA.name = "sql"
+objA.say = function(){
+        console.log(`My name is ${this.name}`)
+}
+
+objA.say()  // My name is sql
+
+console.log(objA.__proto__ === Object.prototype) // true
+console.log(objA instanceof Object) // true
+
+
+const objB = new Object();
+objB.name = 'b';
+objB.sayName = function() {
+    console.log(`My name is ${this.name} !`);
+}
+objB.sayName(); // My name is b !
+console.log(objB.__proto__ === Object.prototype); // true
+console.log(objB instanceof Object); // true
+
+```
+
+new Create()
+创建一个新对象，使用现有的对象来提供新创建的对象的__proto__。
+`Object.create(obj,propertiesObject)`
+
+proto：传递一个现在有的对象，即新对象的原型对象（新创建的对象_proto_属性指向现有属性）
+第一个参数proto的值为null，那么创建出来的对象是一个{}（空对象）并且没有原型;
+
+```js
+const  a = Object.create(null)
+console.log(a) // {}
+console.log(a.__proto__) // undefined
+```
+
+propertiesObject：可选。该参数对象是一组属性与值，该对象的属性名称将是新创建的对象的属性名称，值是属性描述符（这些属性描述符的结构与Object.defineProperties()的第二个参数一样）
+
+```js
+const origin = {
+        num: 2,
+}
+const o = Object.create(origin, {
+  // foo会成为所创建对象的数据属性
+  foo: { 
+    writable:true,
+    configurable:true,
+    // enumerable: true, 如果没有写，enumerable默认为false
+    value: "hello" 
+  },
+  // bar会成为所创建对象的访问器属性
+  bar: {
+    configurable: false,
+    get: function() { return 10 },
+    set: function(value) {
+      console.log("Setting `o.bar` to", value);
+    }
+  }
+});
+
+
+console.log(o); // {foo: 'hello'}
+console.log(o.__proto__ === origin) // true
+console.log(o.num) // 2
+console.log(o.bar) // 10
+console.log(Object.keys(o)) // []
+```
+
 ## 13.写一个使两个整数进行交换的方法（不能使用临时变量）
 
 利用执行顺序
@@ -495,7 +564,7 @@ js代码在执行的时候，会先执行同步代码，遇到异步宏任务则
 每个异步宏任务执行完之后，都会检查是否存在待执行的微任务；如果有，则执行完所有的微任务之后，再继续执行下一个宏任务。
 ![js任务执行顺序](../images/js%E4%BB%BB%E5%8A%A1%E6%89%A7%E8%A1%8C%E9%A1%BA%E5%BA%8F.png)
 
-<font color="red">一次事件循环只能处理一个宏任务，一次事件循环可以将所有的微任务处理完毕。</font>
+`<font color="red">`一次事件循环只能处理一个宏任务，一次事件循环可以将所有的微任务处理完毕。`</font>`
 
 ### 练习题
 
@@ -716,6 +785,7 @@ console.log(a === 1 && a === 2 && a === 3) //true
 ```
 
 这里也可以采用方法2的写法
+
 ```javascript
 Reflect.defineProperty(this, 'a', {
   get () {
@@ -727,7 +797,6 @@ Reflect.defineProperty(this, 'a', {
 综上所述
 用 == 判断，以上方法都可以
 用 === 判断，只有方法2和方法4可以
-
 
 ## 20. js继承实现方式及优缺点
 
@@ -762,6 +831,7 @@ SubType.prototype.getSubValue = function() {
 var instance = new SubType();
 console.log(instance.getSuperValue()); // true
 ```
+
 ![原型链继承](../images/原型链继承-1.png)
 
 原型链方案存在的缺点：多个实例对引用类型的操作会被篡改
@@ -817,7 +887,7 @@ alert(instance2.color);//"red,green,blue"
 
 - 只能继承父类的实例属性和方法，不能继承原型属性/方法(即不能访问Parent.prototype上定义的方法)
 - 无法实现函数复用，每个子类都有父类实例函数的副本(每次创建子类实例都初始化一个父类)，影响性能
-  
+
 3. 组合继承
 
 组合上述两种方法就是组合继承。用原型链实现对原型属性和方法的继承，用借用构造函数技术来实现实例属性的继承。
@@ -907,12 +977,12 @@ console.log(yetAnotherPerson.friends); //"Shelby,Court,Van,Rob,Barbie"
 优点：
 
 - 父类方法可复用
-  
+
 缺点:
 
 - 父类的引用会被所有子类所共享,存在篡改的可能，例如上面的friends属性
 - 类实例不能向父类传参
-  
+
   ES5中存在Object.create()的方法，能够代替上面的object方法。
 
 5. 寄生式继承
@@ -939,9 +1009,9 @@ anotherPerson.sayHi(); //"hi"
 缺点：
 
 - 同原型式继承
-  
+
 6. 寄生组合式继承
-  
+
 ```js
 function inheritPrototype(subType, superType){
   var prototype = Object.create(superType.prototype); // 创建对象，创建父类原型的一个副本
@@ -981,6 +1051,7 @@ instance1.colors.push("2"); // ["red", "blue", "green", "2"]
 instance1.colors.push("3"); // ["red", "blue", "green", "3"]
 
 ```
+
 ![寄生组合式继承](../images/寄生组合式继承.png)
 
 这个例子的高效率体现在它只调用了一次SuperType 构造函数，并且因此避免了在SubType.prototype 上创建不必要的、多余的属性。于此同时，原型链还能保持不变；因此，还能够正常使用instanceof 和isPrototypeOf()。
@@ -992,7 +1063,7 @@ instance1.colors.push("3"); // ["red", "blue", "green", "3"]
 - Child可以向Parent传参
 - 父类方法可以复用
 - 父类的引用属性不会被共享
-  
+
 寄生式组合继承可以算是引用类型继承的最佳模式
 
 ### es6 Class继承
@@ -1019,8 +1090,8 @@ child instanceof Parent // true
 
 class 实现继承的核心在于使用 extends 表明继承自哪个父类，并且在子类构造函数中必须调用 super，因为这段代码可以看成 Parent.call(this, value)。
 
-当然了，之前也说了在 JS 中并不存在类，<font color="red">class 的本质就是函数</font>。
-  
+当然了，之前也说了在 JS 中并不存在类，`<font color="red">`class 的本质就是函数`</font>`。
+
 ## 21.offset、client、scroll系列理解
 
 ### offset系列
@@ -1030,24 +1101,24 @@ class 实现继承的核心在于使用 extends 表明继承自哪个父类，�
 元素可见的大小由其高度、宽度决定，包括所有内边距，滚动条和边框大小四个属性
 ![offset系列](../images/js-21-1-1.png)
 
-<b>offsetParent</b>
+`<b>`offsetParent`</b>`
 
 - offsetParent属性返回一个对象的引用，这个对象是距离调用offsetParent的父级元素中最近的（在包含层次中最靠近的），并且是已进行过CSS定位的容器元素。 如果这个容器元素未进行CSS定位, 则offsetParent属性的取值为根元素的引用。
 - 如果当前元素的父级元素中没有进行CSS定位（position为absolute/relative），offsetParent为body
 - 如果当前元素的父级元素中有CSS定位（position为absolute/relative），offsetParent取父级中最近的元素
-- <font color="red"><b>距离自己最近的并且具有定位属性(position为absolute/relative)的父元素</b></font>
+- `<font color="red"><b>`距离自己最近的并且具有定位属性(position为absolute/relative)的父元素`</b></font>`
 
 #### obj.offsetWidth
 
 指 obj 控件自身的绝对宽度，不包括因 overflow 而未显示的部分，也就是其实际占据的宽度，整型，单位：像素。包含垂直方向上滚动条的宽度。
 
-<font style="font-weight: bold">实际占据的宽度具体是怎末计算的受 box-sizing的影响。
+`<font style="font-weight: bold">`实际占据的宽度具体是怎末计算的受 box-sizing的影响。
 
 如果： box-sizing: border-box；
 实际占据的宽度 = width
 
 如果： box-sizing: content-box;
-实际占据的宽度 = border + paddding + width</font>
+实际占据的宽度 = border + paddding + width`</font>`
 
 #### obj.offsetHeight
 
@@ -1066,10 +1137,10 @@ class 实现继承的核心在于使用 extends 表明继承自哪个父类，�
 client指元素本身的可视内容，不包括overflow被折叠起来的部分，不包括滚动条、border，包括padding
 ![client系列](../images/js-21-1-2.png)
 
-clientWidth:元素<font color="red"><b>内容区宽度</b></font> + 左右内边距宽度
+clientWidth:元素`<font color="red"><b>`内容区宽度`</b></font>` + 左右内边距宽度
 
-clientHeight：元素<font color="red"><b>内容区高度</b></font> + 山下内边距高度
-clientTop、clientLeft 这两个返回的是<font color="red"><b>元素周围边框的厚度</b></font>，一般它的值就是0。因为滚动条不会出现在顶部或者左侧
+clientHeight：元素`<font color="red"><b>`内容区高度`</b></font>` + 山下内边距高度
+clientTop、clientLeft 这两个返回的是`<font color="red"><b>`元素周围边框的厚度`</b></font>`，一般它的值就是0。因为滚动条不会出现在顶部或者左侧
 
 ### scroll系列
 
@@ -1230,7 +1301,7 @@ var和let可以，const不可以
 
 ## 25.setTimeout、setInterval 和 requestAnimationFrame 之间的区别
 
-requestAnimationFrame(code)，一般用于动画，与 setTimeout 方法类似，区别是 setTimeout 是用户指定的，而 requestAnimationFrame 是浏览器刷新频率决定的，一般遵循 W3C 标准，<font color="red">它在浏览器每次刷新页面之前执行。</font>
+requestAnimationFrame(code)，一般用于动画，与 setTimeout 方法类似，区别是 setTimeout 是用户指定的，而 requestAnimationFrame 是浏览器刷新频率决定的，一般遵循 W3C 标准，`<font color="red">`它在浏览器每次刷新页面之前执行。`</font>`
 语法：
 window.requestAnimationFrame(callback);
 
@@ -1291,7 +1362,7 @@ class MyPromise {
         })
       }
     })
-    
+  
   }
 
   reject (reason) { // reason为拒绝态时接收的终值
@@ -1585,17 +1656,13 @@ console.log(create(Person,'张三'))
 new的工作原理：
 
 1. 创建一个空对象，构造函数中的this会指向这个对象
-
 2. 这个新对象会被链接到原型
-
 3. 执行构造函数方法，其属性和方法都会被添加到this引用的对象中
-
 4. 如果构造函数中没有返回新对象，那么返回this，即创建新对象；否则，返回构造函数中返回的对象。
 
 new和字面量创建对象的区别：
 
 1. 字面量创建对象，不会调用Object构造函数，简洁且性能更好；
-
 2. new Object() 方式创建对象本质上是方法调用，涉及到在proto链中遍历该方法，当找到该方法后，又会生产方法调用必须的 堆栈信息，方法调用结束后，还要释放该堆栈，性能不如字面量的方式。
 
 ## 30. V8 下的垃圾回收机制是怎么样的？
@@ -1614,12 +1681,12 @@ v8垃圾回收策略主要采用分代式回收机制，根具对象存活时间
 
 在分代的基础上，新生代中的对象主要通过Scavenge算法进行垃圾回收。而在Scavenge的具体实现中，主要采用了Cheney算法。
 
-Cheney算法是一种采用<font color="red">复制的方式实现垃圾回收</font>的算法。
+Cheney算法是一种采用`<font color="red">`复制的方式实现垃圾回收`</font>`的算法。
 
-<font color="red">它将新生代堆内存一分为二，每一部分空间称为semispace。
+`<font color="red">`它将新生代堆内存一分为二，每一部分空间称为semispace。
 
 在这两个semispace空间中，只有一个处于使用中，另一个处于闲置状态。
-处于使用状态的semispace空间称为From空间，处于闲置状态的空间称为To空间。</font>
+处于使用状态的semispace空间称为From空间，处于闲置状态的空间称为To空间。`</font>`
 
 当我们分配对象时，先在From空间进行分配。当开始进行垃圾回收时，会检查From空间中的存活对象，这些存活对象将被复制到To空间中，而非存活对象占用的空间将会被释放。
 完成复制后，From空间和To空间的角色发生对换，称为翻转。
@@ -1650,7 +1717,7 @@ Mark-sweep 称为对象标记和清除，顾名思义该算法执行了两个步
 标记：标记存活的对象
 清除：清除未被标记的对象，也就是死亡的对象
 
-<font color="red">Mark-Sweep最大的问题是在进行一次标记清除回收后，内存空间会出现不连续的状态。</font>
+`<font color="red">`Mark-Sweep最大的问题是在进行一次标记清除回收后，内存空间会出现不连续的状态。`</font>`
 
 这种内存碎片会对后续的内存分配造成问题，因为很可能出现需要分配一个大对象的情况，这时所有的碎片空间都无法完成此次分配，就会提前触发垃圾回收，而这次回收是不必要的。
 
@@ -1751,37 +1818,27 @@ const throttle = (fn, delayTime) => {
 
 优点如下
 
- 1. 保护变量：闭包可以保护函数内部的变量不被外部访问和修改，提高了程序的安全性。
-
- 2. 延长变量的生命周期：闭包可以使函数内部的变量在函数执行完毕后仍然存在，可以在函数外部继续使用，增加了变量的灵活性。
-
- 3. 实现私有成员：闭包可以模拟面向对象编程中的私有成员，通过将变量封装在闭包内部，外部无法直接访问，只能通过闭包提供的接口来访问。
-
- 4. 实现函数柯里化：闭包可以将一个多参数的函数转化为一个单参数的函数序列，使得函数的调用更加灵活和简洁。
+1. 保护变量：闭包可以保护函数内部的变量不被外部访问和修改，提高了程序的安全性。
+2. 延长变量的生命周期：闭包可以使函数内部的变量在函数执行完毕后仍然存在，可以在函数外部继续使用，增加了变量的灵活性。
+3. 实现私有成员：闭包可以模拟面向对象编程中的私有成员，通过将变量封装在闭包内部，外部无法直接访问，只能通过闭包提供的接口来访问。
+4. 实现函数柯里化：闭包可以将一个多参数的函数转化为一个单参数的函数序列，使得函数的调用更加灵活和简洁。
 
 缺点如下
 
- 1. 内存泄漏：由于闭包会保留对外部变量的引用，如果闭包没有被及时释放，那么这些变量也无法被垃圾回收机制回收，可能导致内存泄漏问题。
+1. 内存泄漏：由于闭包会保留对外部变量的引用，如果闭包没有被及时释放，那么这些变量也无法被垃圾回收机制回收，可能导致内存泄漏问题。
+2. 性能损耗：闭包的创建和执行需要额外的内存和时间开销，因为它需要保存函数及其相关的引用环境，可能会导致程序的性能下降。
+3. 难以理解和调试：闭包的使用可能会增加代码的复杂性，特别是在多层嵌套的情况下，理解闭包的运行机制和调试可能会变得困难。
 
- 2. 性能损耗：闭包的创建和执行需要额外的内存和时间开销，因为它需要保存函数及其相关的引用环境，可能会导致程序的性能下降。
+## 对象属性相关
 
- 3. 难以理解和调试：闭包的使用可能会增加代码的复杂性，特别是在多层嵌套的情况下，理解闭包的运行机制和调试可能会变得困难。
-
-
-
- ## 对象属性相关
-
-  1. Object.keys() 只能遍历自身可枚举属性
-  2. for...in循环遍历自身可枚举属性以及原型上的可枚举属性
-  3. Object.getOwnPropertyNames() 遍历自身所有属性，不论是否可枚举
-
-
+1. Object.keys() 只能遍历自身可枚举属性
+2. for...in循环遍历自身可枚举属性以及原型上的可枚举属性
+3. Object.getOwnPropertyNames() 遍历自身所有属性，不论是否可枚举
 
 ## window.parent、window.self、window.top
 
 1. 说明
-在应用有frameset或者iframe的页面时，parent是父窗口，top是最顶级父窗口（有的窗口中套了好几层frameset或者iframe），self是当前窗口。
-
+   在应用有frameset或者iframe的页面时，parent是父窗口，top是最顶级父窗口（有的窗口中套了好几层frameset或者iframe），self是当前窗口。
 2. window.self
 
 功能：是对当前窗口自身的引用。它和window属性是等价的。
@@ -1816,8 +1873,8 @@ const throttle = (fn, delayTime) => {
 （2）window.top === window.parent （window.top!==window.self）为true表示父窗口就是顶层窗口，只有一层iframe嵌套；为false表示父窗口不是顶层窗口，存在多层iframe嵌套。
 （3）使用不同对象的location. href实现嵌套中指定窗口的跳转；使用不同对象的location. reload()实现嵌套中指定窗口的刷新。
 
-
 ## 单例模式
+
 ```js
 // 单例模式包装器 传入一个构造函数，返回该构造器对应的单例函数
 function singletonWrap (className) { 
