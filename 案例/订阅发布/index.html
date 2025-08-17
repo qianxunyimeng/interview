@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PubSub消息系统</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+  <div class="container">
+    <header>
+      <h1><i class="fas fa-exchange-alt"></i> 高级PubSub消息系统</h1>
+      <p class="subtitle">支持全局配置、配置合并、消息广播、ACK确认和历史回放的完整消息系统</p>
+
+      <div class="feature-badges">
+        <div class="badge"><i class="fas fa-cog"></i> 全局配置</div>
+        <div class="badge"><i class="fas fa-layer-group"></i> 配置合并</div>
+        <div class="badge"><i class="fas fa-broadcast-tower"></i> 单播/多播</div>
+        <div class="badge"><i class="fas fa-history"></i> 历史回放</div>
+        <div class="badge"><i class="fas fa-check-circle"></i> ACK确认</div>
+        <div class="badge"><i class="fas fa-clock"></i> 超时处理</div>
+      </div>
+    </header>
+
+    <div class="config-section">
+      <div class="card-header">
+        <h2><i class="fas fa-sliders-h"></i> 全局配置控制台</h2>
+      </div>
+
+      <div class="config-grid">
+        <div class="config-box">
+          <div class="form-group">
+            <label for="globalMaxHistory"><i class="fas fa-database"></i> 最大历史消息数</label>
+            <input type="number" id="globalMaxHistory" min="1" max="50" value="5">
+          </div>
+
+          <div class="form-group">
+            <label for="globalTimeout"><i class="fas fa-stopwatch"></i> 消息超时时间(ms)</label>
+            <input type="number" id="globalTimeout" min="0" value="15000">
+          </div>
+        </div>
+
+        <div class="config-box">
+          <div class="form-group">
+            <label for="globalBroadcastMode"><i class="fas fa-bullhorn"></i> 默认广播模式</label>
+            <select id="globalBroadcastMode">
+              <option value="multicast">多播 (不限消费次数)</option>
+              <option value="single">单播 (仅第一个订阅者消费)</option>
+              <option value="limited">限制消费次数</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="globalMaxConsumption"><i class="fas fa-user-friends"></i> 默认最大消费次数</label>
+            <input type="number" id="globalMaxConsumption" min="1" value="3">
+          </div>
+        </div>
+
+        <div class="config-box">
+          <div class="form-group">
+            <label for="globalHistoryEnabled"><i class="fas fa-history"></i>
+              <input type="checkbox" id="globalHistoryEnabled" checked>
+              历史回放默认启用
+            </label>
+          </div>
+
+          <div class="form-group">
+            <label for="globalPublisherName"><i class="fas fa-user-tag"></i> 发布者默认名称</label>
+            <input type="text" id="globalPublisherName" value="系统发布者">
+          </div>
+
+          <button id="updateGlobalConfig" class="info"><i class="fas fa-sync-alt"></i> 更新全局配置</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="dashboard">
+      <div class="card">
+        <div class="card-header">
+          <h2><i class="fas fa-paper-plane"></i> 消息发布控制台</h2>
+        </div>
+
+        <div class="form-group">
+          <label for="topic"><i class="fas fa-hashtag"></i> 主题名称</label>
+          <input type="text" id="topic" placeholder="例如：news.sports" value="news.sports">
+        </div>
+
+        <div class="form-group">
+          <label for="message"><i class="fas fa-envelope"></i> 消息内容</label>
+          <textarea id="message" placeholder="输入要发布的消息内容...">NBA总决赛正在火热进行中，敬请关注！</textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="broadcastMode"><i class="fas fa-bullhorn"></i> 广播模式</label>
+          <select id="broadcastMode">
+            <option value="">使用全局默认</option>
+            <option value="multicast">多播 (不限消费次数)</option>
+            <option value="single">单播 (仅第一个订阅者消费)</option>
+            <option value="limited">限制消费次数</option>
+          </select>
+        </div>
+
+        <div id="maxConsumptionContainer" style="display: none;">
+          <label for="maxConsumption"><i class="fas fa-user-friends"></i> 最大消费次数</label>
+          <input type="number" id="maxConsumption" min="1" value="3">
+        </div>
+
+        <div class="form-group">
+          <label for="historyConfig"><i class="fas fa-history"></i> 历史记录配置 (覆盖全局)</label>
+          <div class="actions">
+            <input type="number" id="historySize" min="0" max="50" placeholder="历史记录大小">
+            <input type="number" id="messageTimeout" min="0" placeholder="消息超时时间(ms)">
+          </div>
+        </div>
+
+        <div class="message-visual">
+          <div class="message-flow"></div>
+          <div class="message-ball ball1">MSG</div>
+          <div class="message-ball ball2">ACK</div>
+          <div class="message-ball ball3">HIST</div>
+        </div>
+
+        <div class="actions">
+          <button id="publishBtn"><i class="fas fa-paper-plane"></i> 发布消息</button>
+          <button id="publishNoSubBtn" class="warning"><i class="fas fa-user-slash"></i> 发布无订阅者消息</button>
+        </div>
+
+        <h3 style="margin-top: 25px; display: flex; align-items: center; gap: 10px;">
+          <i class="fas fa-file-alt"></i> 发布日志
+        </h3>
+        <div class="logs" id="publishLog">
+          <div class="log-entry system">
+            <span class="log-time">[系统启动]</span> 发布系统准备就绪，请配置全局设置并发布消息
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <h2><i class="fas fa-inbox"></i> 消息订阅控制台</h2>
+        </div>
+
+        <div class="form-group">
+          <label for="subTopic"><i class="fas fa-hashtag"></i> 订阅主题</label>
+          <input type="text" id="subTopic" placeholder="例如：news.sports" value="news.sports">
+        </div>
+
+        <div class="form-group">
+          <label for="subscriberId"><i class="fas fa-id-card"></i> 订阅者ID</label>
+          <input type="text" id="subscriberId" placeholder="输入自定义订阅者ID (可选)">
+        </div>
+
+        <div class="form-group">
+          <label><i class="fas fa-history"></i>
+            <input type="checkbox" id="replayHistory" checked>
+            接收历史消息
+          </label>
+        </div>
+
+        <button id="subscribeBtn" class="secondary"><i class="fas fa-plus-circle"></i> 创建订阅者</button>
+
+        <div class="topic-info">
+          <div class="topic-card">
+            <h3><i class="fas fa-basketball-ball"></i> news.sports</h3>
+            <div class="metrics">
+              <div class="metric-box">
+                <div class="metric-value sub-count" id="sportsSubCount">0</div>
+                <div class="metric-label">活跃订阅者</div>
+              </div>
+              <div class="metric-box">
+                <div class="metric-value pending-count" id="sportsPendingCount">0</div>
+                <div class="metric-label">等待消息</div>
+              </div>
+            </div>
+            <button class="info" id="viewSportsDetails"><i class="fas fa-chart-bar"></i> 查看详情</button>
+          </div>
+
+          <div class="topic-card">
+            <h3><i class="fas fa-cloud-sun"></i> weather.update</h3>
+            <div class="metrics">
+              <div class="metric-box">
+                <div class="metric-value sub-count" id="weatherSubCount">0</div>
+                <div class="metric-label">活跃订阅者</div>
+              </div>
+              <div class="metric-box">
+                <div class="metric-value pending-count" id="weatherPendingCount">0</div>
+                <div class="metric-label">等待消息</div>
+              </div>
+            </div>
+            <button class="info" id="viewWeatherDetails"><i class="fas fa-chart-bar"></i> 查看详情</button>
+          </div>
+        </div>
+
+        <h3 style="margin-top: 25px; display: flex; align-items: center; gap: 10px;">
+          <i class="fas fa-file-alt"></i> 订阅日志
+        </h3>
+        <div class="logs" id="subscribeLog">
+          <div class="log-entry system">
+            <span class="log-time">[系统启动]</span> 订阅系统准备就绪，请创建订阅者
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <h2><i class="fas fa-tasks"></i> 配置合并演示</h2>
+      </div>
+
+      <div class="demo-buttons">
+        <div class="demo-button" id="demoGlobalConfig">
+          <i class="fas fa-cogs"></i>
+          <p>全局配置优先级</p>
+          <small>无发布配置时使用全局配置</small>
+        </div>
+        <div class="demo-button" id="demoConfigMerge">
+          <i class="fas fa-layer-group"></i>
+          <p>配置合并示例</p>
+          <small>全局+发布配置=最终配置</small>
+        </div>
+        <div class="demo-button" id="demoLocalOverride">
+          <i class="fas fa-code-merge"></i>
+          <p>局部覆盖示例</p>
+          <small>发布配置覆盖全局配置</small>
+        </div>
+        <div class="demo-button" id="demoMessageLifetime">
+          <i class="fas fa-hourglass-half"></i>
+          <p>消息生命周期</p>
+          <small>从发布到消费全过程</small>
+        </div>
+      </div>
+    </div>
+
+    <div class="system-log">
+      <div class="system-log-header">
+        <i class="fas fa-terminal"></i>
+        <h2>系统日志</h2>
+      </div>
+      <div class="logs" id="systemLog">
+        <div class="log-entry system">
+          <span class="log-time">[系统启动]</span> PubSub系统初始化完成，使用默认全局配置
+        </div>
+        <div class="log-entry system">
+          <span class="log-time">[系统启动]</span> 全局配置: maxHistory=5, messageTimeout=15000ms, broadcastMode=multicast
+        </div>
+      </div>
+    </div>
+
+    <footer>
+      <p>高级PubSub消息系统 | 支持全局配置和局部覆盖的强大消息中间件</p>
+      <p>© 2023 消息系统实验室 | 设计：前端架构师团队</p>
+    </footer>
+  </div>
+
+  <script src="pubsub.js"></script>
+  <script src="app.js"></script>
+</body>
+
+</html>

@@ -93,7 +93,7 @@ new 操作符的几个作用
 new 操作符会返回一个对象，所以我们需要在内部创建一个对象
 这个对象，也就是构造函数中的 this，可以访问到挂载在 this 上的任意属性
 这个对象可以访问到构造函数原型上的属性，所以需要将对象与构造函数链接起来
-返回原始值需要忽略，返回对象需要正常处理     
+返回原始值需要忽略，返回对象需要正常处理·
 
 着手实现功能
 
@@ -1090,7 +1090,7 @@ child instanceof Parent // true
 
 class 实现继承的核心在于使用 extends 表明继承自哪个父类，并且在子类构造函数中必须调用 super，因为这段代码可以看成 Parent.call(this, value)。
 
-当然了，之前也说了在 JS 中并不存在类，`<font color="red">`class 的本质就是函数`</font>`。
+当然了，之前也说了在 JS 中并不存在类，`<font color="red">`class 的本质就是函数 `</font>`。
 
 ## 21.offset、client、scroll系列理解
 
@@ -1101,12 +1101,12 @@ class 实现继承的核心在于使用 extends 表明继承自哪个父类，�
 元素可见的大小由其高度、宽度决定，包括所有内边距，滚动条和边框大小四个属性
 ![offset系列](../images/js-21-1-1.png)
 
-`<b>`offsetParent`</b>`
+`<b>`offsetParent `</b>`
 
 - offsetParent属性返回一个对象的引用，这个对象是距离调用offsetParent的父级元素中最近的（在包含层次中最靠近的），并且是已进行过CSS定位的容器元素。 如果这个容器元素未进行CSS定位, 则offsetParent属性的取值为根元素的引用。
 - 如果当前元素的父级元素中没有进行CSS定位（position为absolute/relative），offsetParent为body
 - 如果当前元素的父级元素中有CSS定位（position为absolute/relative），offsetParent取父级中最近的元素
-- `<font color="red"><b>`距离自己最近的并且具有定位属性(position为absolute/relative)的父元素`</b></font>`
+- `<font color="red"><b>`距离自己最近的并且具有定位属性(position为absolute/relative)的父元素 `</b></font>`
 
 #### obj.offsetWidth
 
@@ -1118,7 +1118,7 @@ class 实现继承的核心在于使用 extends 表明继承自哪个父类，�
 实际占据的宽度 = width
 
 如果： box-sizing: content-box;
-实际占据的宽度 = border + paddding + width`</font>`
+实际占据的宽度 = border + paddding + width `</font>`
 
 #### obj.offsetHeight
 
@@ -1137,10 +1137,10 @@ class 实现继承的核心在于使用 extends 表明继承自哪个父类，�
 client指元素本身的可视内容，不包括overflow被折叠起来的部分，不包括滚动条、border，包括padding
 ![client系列](../images/js-21-1-2.png)
 
-clientWidth:元素`<font color="red"><b>`内容区宽度`</b></font>` + 左右内边距宽度
+clientWidth:元素 `<font color="red"><b>`内容区宽度 `</b></font>` + 左右内边距宽度
 
-clientHeight：元素`<font color="red"><b>`内容区高度`</b></font>` + 山下内边距高度
-clientTop、clientLeft 这两个返回的是`<font color="red"><b>`元素周围边框的厚度`</b></font>`，一般它的值就是0。因为滚动条不会出现在顶部或者左侧
+clientHeight：元素 `<font color="red"><b>`内容区高度 `</b></font>` + 山下内边距高度
+clientTop、clientLeft 这两个返回的是 `<font color="red"><b>`元素周围边框的厚度 `</b></font>`，一般它的值就是0。因为滚动条不会出现在顶部或者左侧
 
 ### scroll系列
 
@@ -1681,7 +1681,7 @@ v8垃圾回收策略主要采用分代式回收机制，根具对象存活时间
 
 在分代的基础上，新生代中的对象主要通过Scavenge算法进行垃圾回收。而在Scavenge的具体实现中，主要采用了Cheney算法。
 
-Cheney算法是一种采用`<font color="red">`复制的方式实现垃圾回收`</font>`的算法。
+Cheney算法是一种采用 `<font color="red">`复制的方式实现垃圾回收 `</font>`的算法。
 
 `<font color="red">`它将新生代堆内存一分为二，每一部分空间称为semispace。
 
